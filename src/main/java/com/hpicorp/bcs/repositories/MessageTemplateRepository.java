@@ -2,6 +2,8 @@ package com.hpicorp.bcs.repositories;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -19,9 +21,10 @@ public interface MessageTemplateRepository extends PagingAndSortingRepository<Me
 	@Query(value = "delete from message_template_action where template_id = :templateId ", nativeQuery = true)
 	public void deleteByTemplateID(@Param("templateId") long templateId);
 
-	@Modifying
-	@Transactional
-	@Query(value = "select M from MessageTemplate M where M.text <> :type and M.modifyUser <> 'activity' order by M.id desc ")
-	public List<MessageTemplate> getMessageTeamplateByType(@Param("type") String type);
+	@Query(value = "select M from MessageTemplate M order by M.id desc ")
+	public List<MessageTemplate> getMessageTeamplateByType();
+	
+	@Query(value = "select M from MessageTemplate M where M.type = 'buttons' or M.type = 'confirm' order by M.id desc ")
+	public Page<MessageTemplate> getMessageTeamplateByType(Pageable pageable);
 	
 }

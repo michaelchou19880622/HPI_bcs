@@ -21,8 +21,12 @@ public class MessageTemplateService {
 		return messageTemplateRepository.findAll(pageable);
 	}
 
-	public List<MessageTemplate> getAllMessageTemplate() {
-		return messageTemplateRepository.getMessageTeamplateByType("LINK");
+	public List<MessageTemplate> getAllMessageTemplateByType() {
+		return messageTemplateRepository.getMessageTeamplateByType();
+	}
+	
+	public Page<MessageTemplate> getAllMessageTemplateByType(Pageable pageable) {
+		return messageTemplateRepository.getMessageTeamplateByType(pageable);
 	}
 
 	public MessageTemplate insert(MessageTemplate messageTemplate) {

@@ -127,6 +127,67 @@ public class LineUserGroupController {
 		lineUserGroup.setModifyTime(new Date());
 		return lineUserGroupRepository.save(lineUserGroup);
 	}
+	
+	@SuppressWarnings("unchecked")
+	@PostMapping("/newgroup")
+	@Transactional(rollbackFor = Exception.class)
+	public ResponseEntity<Object> createLineUserGroupWithCondition(@Valid @RequestBody List<Map<String, Object>> createData) throws Exception {
+
+		// Step 1. 宣告資料
+		Long groupId;
+		Map<String, String> groupDataMap = new HashMap<>();
+		List<Map<String, Object>> fileDataList = new ArrayList<>();
+
+		// Step 2. 檢查參數
+		if (createData.isEmpty()) {
+			return ResponseEntity.badRequest().body("No data found !");
+		}
+
+		// Step 3. 取得資料
+		for (int i = 0; i < createData.size(); i++) {
+			if (createData.get(i).containsKey(groupDataKey)) {
+				groupDataMap = (Map<String, String>) createData.get(i).get(groupDataKey);
+			}
+			if (createData.get(i).containsKey(fileListKey)) {
+				fileDataList = (List<Map<String, Object>>) createData.get(i).get(fileListKey);
+			}
+		}
+
+		// Step 4. 創建群組
+		try {
+			LineUserGroup lineUserGroup = new LineUserGroup();
+			lineUserGroup.setName(groupDataMap.get("name"));
+			lineUserGroup.setDescription(groupDataMap.get("description"));
+			lineUserGroup.setModifyAccount(groupDataMap.get("modify_account"));
+			LineUserGroup createdLineUserGroup = createLineUserGroup(lineUserGroup);
+			groupId = createdLineUserGroup.getId();
+		} catch (Exception e) {
+			log.error("Create Group Exception - ", e);
+			throw e;
+		}
+
+		// Step 5. 更新群組收尋語法
+		if (!fileDataList.isEmpty()) {
+			try {
+				for (Map<String, Object> file : fileDataList) {
+					uploadUidService.updateByFilename(getFilename(file), groupId);
+				}
+			} catch (Exception e) {
+				log.error("create lineuser_group error => {}", e);
+				throw e;
+			}
+		}
+
+		// Step 6. update group with getusers
+		try {
+			String getUsers = buildGetUsersScript(fileDataList);
+			lineUserGroupRepository.updateGetUsers(groupId, getUsers);
+		} catch (Exception e) {
+			log.error("Update Group with getUsers Exception - ", e);
+			throw e;
+		}
+		return ResponseEntity.ok().build();
+	}
 
 	@SuppressWarnings("unchecked")
 	@PutMapping("/modifygroup/{id}")
@@ -318,4 +379,23 @@ public class LineUserGroupController {
 	public String getFilename(Map<String, Object> file) {
 		return file.get("response").toString().split("success:")[1];
 	}
+	
+	@PostMapping("/compare")
+	public ResponseEntity<Object> compareLineUser(@Valid @RequestBody List<Map<String, String>> fileList) {
+		List<String> mappedUidList = new ArrayList<>();
+		if (fileList.isEmpty()) {
+			return ResponseEntity.badRequest().body("尚未上傳檔案！");
+		} else {
+			for (Map<String, String> filenameMap : fileList) {
+				String filename = filenameMap.get("response").split("success:")[1];
+				List<UploadUid> uploadUidList = uploadUidService.findByfilename(filename);
+				for (UploadUid uploadUid : uploadUidList) {
+					if (!mappedUidList.contains(uploadUid.getUid()))
+						mappedUidList.add(uploadUid.getUid());
+				}
+			}
+		}
+		return ResponseEntity.ok().body(mappedUidList.size());
+	}
+	
 }

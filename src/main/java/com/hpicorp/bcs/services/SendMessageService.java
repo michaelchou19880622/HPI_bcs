@@ -69,6 +69,10 @@ public class SendMessageService {
 
 	@Autowired
 	private MessageTemplateService messageTemplateService;
+	
+	public Page<SendMessage> getAllSendMessage(Pageable pageable) {
+		return sendMessageRepository.findAll(pageable);
+	}
 
 	public Page<SendMessage> getAllSendMessage(Pageable pageable, String type) {
 		return sendMessageRepository.findByType(pageable, type);

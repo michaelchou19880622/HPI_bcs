@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.hpicorp.bcs.entities.MessageCarouselTemplate;
@@ -25,12 +26,11 @@ public class MessageCarouselTemplateService {
 	private MessageCarouselActionRepository messageCarouselActionRepository;
 
 	public List<MessageCarouselTemplate> getAllMessageCarouselTemplate() {
-		Sort sortSpec = orderBy();
-		return messageCarouselTemplateRepository.findAll(sortSpec);
+		return messageCarouselTemplateRepository.findAll();
 	}
-
-	private Sort orderBy() {
-		return new Sort(Sort.Direction.DESC, "id");
+	
+	public Page<MessageCarouselTemplate> getAllMessageCarouselTemplate(Pageable pageable) {
+		return messageCarouselTemplateRepository.findAll(pageable);
 	}
 
 	public void insert(MessageCarouselTemplate messageCarouselTemplate) {

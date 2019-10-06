@@ -104,6 +104,12 @@ public class SendMessageController {
 	@PersistenceContext
 	private EntityManager em;
 
+	@GetMapping(path = "/sendMessage/all")
+	public @ResponseBody Page<SendMessage> getAll(
+			@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable) {
+		return sendMessageService.getAllSendMessage(pageable);
+	}
+	
 	@GetMapping(path = "/sendMessage/all/{type}")
 	public @ResponseBody Page<SendMessage> getAllSendMessage(
 			@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable, @PathVariable("type") String type) {
@@ -163,8 +169,7 @@ public class SendMessageController {
 				MessageSticker sticker = am.getMessageStickerList().get(0);
 				messageStickerService.insert(sticker);
 				am.setMessageId(Integer.parseInt(sticker.getId().toString()));
-			} else if (typelist[0].trim().equals(MessageType.LINK.getValue())) // NEED TO MATCH BUTTONS OF TEMPLATE
-			{
+			} else if (typelist[0].trim().equals(MessageType.LINK.getValue())) {
 				MessageTemplate messageTemplate = am.getMessageTemplateList().get(0);
 				for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
 					d.setLabel(d.getText());
@@ -190,26 +195,23 @@ public class SendMessageController {
 			if (sUser.isPresent()) {
 				Long uid = lineUserRepository.getIdByUid(sUser.get().getLineuserUid());
 				if (uid != null) {
-					sb.append("INSERT INTO send_message_users(send_id,line_user_id) VALUES ");
+					sb.append("insert into send_message_users (send_id, line_user_id) values ");
 					sb.append(String.format("(%s,%s)", newId, uid));
-					log.info("SQL:" + sb.toString());
+					log.info("SQL => " + sb.toString());
 					sendMessageService.insSendMessageUser(sb.toString());
 				}
 			}
 		} else if (groupID == -9) { // All
-			sb.append("INSERT INTO send_message_users(send_id,line_user_id) ");
-			sb.append("Select " + newId + ", id from lineuser where length(line_uid) = 33 ;");
-			log.info("SQL:" + sb.toString());
+			sb.append("insert into send_message_users (send_id, line_user_id) ");
+			sb.append("select " + newId + ", id from lineuser where length(line_uid) = 33 ;");
+			log.info("SQL => " + sb.toString());
 			sendMessageService.insSendMessageUser(sb.toString());
 		} else if (groupID == -99) { // Send to Test Group
-			sb.append(
-					"select id FROM bcs.lineuser where line_uid in (SELECT lineuser_uid FROM bcs.systemuser where length(lineuser_uid)=33)");
-			log.info("SQL:" + sb.toString());
+			sb.append("select id from lineuser where line_uid in (select lineuser_uid from systemuser where length(lineuser_uid) = 33)");
+			log.info("SQL:=> " + sb.toString());
 		} else if (groupID > 0) {
 			List<BigInteger> lineUserList = sendMessageService.getLineUserGroupListById(groupID);
-			// INSERT INTO `send_message_users` VALUES
-			// (144194,835,3,0,NULL,NULL),(144195,835,4,0,NULL,NULL),
-			sb.append("INSERT INTO send_message_users(send_id,line_user_id) VALUES ");
+			sb.append("insert into send_message_users (send_id, line_user_id) values ");
 			int idx = 0;
 			for (BigInteger lid : lineUserList) {
 				if (idx > 0)

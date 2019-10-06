@@ -17,29 +17,28 @@ public interface LinkAddressTrackRepository extends PagingAndSortingRepository<L
 	@Query(value = "select linked from lineuser_link where user_id= :userid ", nativeQuery = true)
 	public String getLinkedByUserID(@Param("userid") long userid);
 
+	// 2019.10.6 已確認該 SQL 會被使用
 	@Query(value = "select "
-				 + "		l.title, "
-				 + "		l.url, "
-				 + "		linkaddresslist_id, "
+				 + "		l.title as title, "
+				 + "		l.url as url, "
+				 + "		linkaddresslist_id as linkAddressListId, "
 				 + "		sum(cnt) as tot, "
 				 + "		count(lineuser_id) as cnt "
 				 + "from "
 				 + "(select linkaddresslist_id, lineuser_id, count(id) as cnt from linkaddress_track group by linkaddresslist_id, lineuser_id) t , linkaddresslist l "
 				 + "where t.linkaddresslist_id = l.id " 
 				 + "group by linkaddresslist_id", nativeQuery = true)
-	public List<Object[]> getLinkAddressTrack();
-
+	public Page<Object[]> getLinkAddressTrackByPage(Pageable pageable);
+	
+	// 2019.10.6 已確認該 SQL 會被使用
 	@Query(value = "select "
-				 + "		l.title, "
-				 + "		l.url, "
-				 + "		linkaddresslist_id, "
+				 + "		t.DateOnly as date, "
 				 + "		sum(cnt) as tot, "
 				 + "		count(lineuser_id) as cnt "
-				 + "from "
-				 + "(select linkaddresslist_id, lineuser_id, count(id) as cnt from linkaddress_track group by linkaddresslist_id, lineuser_id) t , linkaddresslist l "
-				 + "where t.linkaddresslist_id = l.id " 
-				 + "group by linkaddresslist_id", nativeQuery = true)
-	public Page<Object[]> getLinkAddressTrackBypage(Pageable pageable);
+				 + "from  "
+				 + "(select DATE(create_time) DateOnly, lineuser_id, count(id) as cnt from linkaddress_track where linkaddresslist_id = :id group by DateOnly, lineuser_id) t "
+				 + "group by t.DateOnly", nativeQuery = true)
+	public List<Object[]> getLinkAddressTrackDetailByPage(@Param("id") long id);
 
 	@Query(value = "select "
 				 + "		l.title, "
@@ -52,15 +51,6 @@ public interface LinkAddressTrackRepository extends PagingAndSortingRepository<L
 				 + "where t.linkaddresslist_id = l.id and l.title like %:name% "
 				 + "group by linkaddresslist_id", nativeQuery = true)
 	public List<Object[]> getLinkAddressTrackByName(@Param("name") String name);
-
-	@Query(value = "select "
-				 + "		t.DateOnly, "
-				 + "		sum(cnt) as tot, "
-				 + "		count(lineuser_id) as cnt "
-				 + "from  "
-				 + "(select DATE(create_time) DateOnly, lineuser_id, count(id) as cnt from linkaddress_track where linkaddresslist_id = :id group by DateOnly, lineuser_id) t "
-				 + "group by t.DateOnly", nativeQuery = true)
-	public List<Object[]> getLinkAddressTrackDetail(@Param("id") long id);
 
 	@Query(value = "select line_uid "
 				 + "from lineuser "

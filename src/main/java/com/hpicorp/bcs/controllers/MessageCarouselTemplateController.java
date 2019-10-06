@@ -5,12 +5,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,8 +45,8 @@ public class MessageCarouselTemplateController {
 	private MessageCarouselTemplateService messageCarouselTemplateService;
 
 	@GetMapping(path = "/messageCarouselTemplate/all")
-	public @ResponseBody List<MessageCarouselTemplate> getAllMessageTemplate() {
-		return messageCarouselTemplateService.getAllMessageCarouselTemplate();
+	public @ResponseBody Page<MessageCarouselTemplate> getAllMessageTemplate(@PageableDefault(size = 10) Pageable pageable) {
+		return messageCarouselTemplateService.getAllMessageCarouselTemplate(pageable);
 	}
 
 	@GetMapping(path = "/messageCarouselTemplate/{id}")

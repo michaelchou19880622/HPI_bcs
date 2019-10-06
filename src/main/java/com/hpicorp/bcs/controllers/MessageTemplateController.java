@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +15,9 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -77,7 +79,7 @@ public class MessageTemplateController {
 
 	@GetMapping(path = "/messageTemplate/allData")
 	public @ResponseBody List<MessageTemplate> getAllMessageTemplates(@RequestParam(value = "page", defaultValue = "0") Integer page) {
-		List<MessageTemplate> tmpList = messageTemplateService.getAllMessageTemplate();
+		List<MessageTemplate> tmpList = messageTemplateService.getAllMessageTemplateByType();
 		List<MessageCarouselTemplate> ctmplist = messageCarouselTemplateService.getAllMessageCarouselTemplate();
 		for (MessageCarouselTemplate t : ctmplist) {
 			MessageTemplate newtemplate = new MessageTemplate();
@@ -113,54 +115,54 @@ public class MessageTemplateController {
 	}
 
 	@GetMapping(path = "/messageTemplate/all")
-	public @ResponseBody Map<String, Object> getAllMessageTemplate(@RequestParam(value = "page", defaultValue = "0") Integer page) {
+	public Page<MessageTemplate> getAllMessageTemplate(@PageableDefault(size = 10) Pageable pageable) {
 
-		List<MessageTemplate> tmpList = messageTemplateService.getAllMessageTemplate();
-		List<MessageCarouselTemplate> ctmplist = messageCarouselTemplateService.getAllMessageCarouselTemplate();
-		for (MessageCarouselTemplate t : ctmplist) {
-			MessageTemplate newtemplate = new MessageTemplate();
-			newtemplate.setId(t.getId().intValue());
-			newtemplate.setAltText(t.getAltText());
-			newtemplate.setType(t.getType());
-			MessageCarouselColumn col = t.getMessageCarouseColumnList().get(0);
-			newtemplate.setThumbnailImageUrl(col.getThumbnailImageUrl());
-			List<MessageTemplateAction> alist = new ArrayList<>();
-			for (MessageCarouselAction a : col.getMessageCarouselActionList()) {
-				MessageTemplateAction newList = new MessageTemplateAction();
-				newList.setData(a.getData());
-				newList.setId(a.getId());
-				newList.setLabel(a.getLabel());
-				newList.setTemplateType(a.getTemplateType());
-				newList.setText(a.getText());
-				newList.setType(a.getType());
-				newList.setUri(a.getUri());
-				alist.add(newList);
-			}
-			newtemplate.setMessageTemplateActionList(alist);
-			tmpList.add(newtemplate);
-		}
-		Collections.sort(tmpList, new Comparator<MessageTemplate>() {
-			public int compare(MessageTemplate o1, MessageTemplate o2) {
-				if (o1.getId() > o2.getId())
-					return -1;
-				return o1.getId() == o2.getId() ? 0 : 1;
-			}
-		});
-		int ifrom = 0;
-		int ito = 10;
-		if (page > 0) {
-			ifrom = page * 10;
-			ito = ifrom + 10;
-		}
-		if (ito > tmpList.size())
-			ito = tmpList.size();
-
-		Map<String, Object> result = new HashMap<>();
-		result.put("total", tmpList.size() / 10 + (tmpList.size() % 10 > 0 ? 1 : 0));
-		result.put("number", page);
-		result.put("totalElements", tmpList.size());
-		result.put("content", tmpList.subList(ifrom, ito));
-		return result;
+		return messageTemplateService.getAllMessageTemplateByType(pageable);
+//		List<MessageCarouselTemplate> ctmplist = messageCarouselTemplateService.getAllMessageCarouselTemplate();
+//		for (MessageCarouselTemplate t : ctmplist) {
+//			MessageTemplate newtemplate = new MessageTemplate();
+//			newtemplate.setId(t.getId().intValue());
+//			newtemplate.setAltText(t.getAltText());
+//			newtemplate.setType(t.getType());
+//			MessageCarouselColumn col = t.getMessageCarouseColumnList().get(0);
+//			newtemplate.setThumbnailImageUrl(col.getThumbnailImageUrl());
+//			List<MessageTemplateAction> alist = new ArrayList<>();
+//			for (MessageCarouselAction a : col.getMessageCarouselActionList()) {
+//				MessageTemplateAction newList = new MessageTemplateAction();
+//				newList.setData(a.getData());
+//				newList.setId(a.getId());
+//				newList.setLabel(a.getLabel());
+//				newList.setTemplateType(a.getTemplateType());
+//				newList.setText(a.getText());
+//				newList.setType(a.getType());
+//				newList.setUri(a.getUri());
+//				alist.add(newList);
+//			}
+//			newtemplate.setMessageTemplateActionList(alist);
+//			tmpList.add(newtemplate);
+//		}
+//		Collections.sort(tmpList, new Comparator<MessageTemplate>() {
+//			public int compare(MessageTemplate o1, MessageTemplate o2) {
+//				if (o1.getId() > o2.getId())
+//					return -1;
+//				return o1.getId() == o2.getId() ? 0 : 1;
+//			}
+//		});
+//		int ifrom = 0;
+//		int ito = 10;
+//		if (page > 0) {
+//			ifrom = page * 10;
+//			ito = ifrom + 10;
+//		}
+//		if (ito > tmpList.size())
+//			ito = tmpList.size();
+//
+//		Map<String, Object> result = new HashMap<>();
+//		result.put("total", tmpList.size() / 10 + (tmpList.size() % 10 > 0 ? 1 : 0));
+//		result.put("number", page);
+//		result.put("totalElements", tmpList.size());
+//		result.put("content", tmpList.subList(ifrom, ito));
+//		return result;
 	}
 
 	// 20180703 Arnor, To get message id, change return type from String to

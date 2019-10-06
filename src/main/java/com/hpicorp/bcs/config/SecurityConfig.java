@@ -3,6 +3,7 @@ package com.hpicorp.bcs.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -71,9 +72,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             				 "/**/*.css/",
             				 "/**/*.js",
             				 "/message").permitAll()
-            .antMatchers("/api/auth/**").permitAll()
-            .antMatchers("/lineuser/sprivateCode/**").permitAll()
-            .antMatchers("/line/login/**").permitAll()
+            .antMatchers("/api/auth/**").permitAll()	// 登入的驗證
+            .antMatchers("/line/login/**").permitAll() // Line Login 的驗證
+            .antMatchers(HttpMethod.GET, "/getImageMap/*").permitAll() // 取得 ImageMap 的圖片
             .anyRequest()
             .authenticated();
 
