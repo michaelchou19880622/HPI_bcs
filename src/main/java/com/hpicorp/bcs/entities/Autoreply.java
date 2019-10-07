@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -66,7 +67,8 @@ public class Autoreply implements Serializable {
 	@Column(name = "lineusergroup_id")
 	private Long lineusergroupId;
 
-	@Column(name = "creation_time", nullable = false, insertable = false, updatable = false)
+//	@Column(name = "creation_time", nullable = false, insertable = false, updatable = false)
+	@Column(name = "creation_time", nullable = false, updatable = false)
 	private Date creationTime;
 
 	@Column(name = "modification_time", nullable = false, insertable = false, updatable = false)
@@ -80,5 +82,11 @@ public class Autoreply implements Serializable {
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "autoreply", orphanRemoval = true)
 	private List<AutoreplyMessageList> autoreplyMessageList = new ArrayList<>();
+	
+	@PrePersist
+	public void setCreationTimeWhileInsert() {
+		this.creationTime = new Date();
+	}
+	
 
 }
