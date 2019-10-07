@@ -152,7 +152,7 @@ public class AutoreplyController {
 			return mapped;
 		} catch (Exception e) {
 			log.info("Exception = ", e);
-			
+			return null;
 		}
 
 	}
