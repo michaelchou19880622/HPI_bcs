@@ -104,48 +104,56 @@ public class AutoreplyController {
 			d.setAutoreply(autoreply);
 		}
 
-		for (AutoreplyMessageList am : autoreply.getAutoreplyMessageList()) {
-			am.setAutoreply(autoreply);
-			String[] typelist = am.getMessageType().split(";");
-			if (typelist[0].trim().equals(MessageType.TEXT.getValue())) {
-				MessageText txt = am.getMessageTextList().get(0);
-				messageTextService.insert(txt);
-				am.setMessageId(txt.getId());
-			} else if (typelist[0].trim().equals(MessageType.IMAGE.getValue())) {
-				MessageImage img = am.getMessageImageList().get(0);
-				messageImageService.insert(img);
-				am.setMessageId(img.getId());
-			} else if (typelist[0].trim().equals(MessageType.VIDEO.getValue())) {
-				MessageVideo video = am.getMessageVideoList().get(0);
-				messageVideoService.insert(video);
-				am.setMessageId(video.getId());
-			} else if (typelist[0].trim().equals(MessageType.AUDIO.getValue())) {
-				MessageAudio audio = am.getMessageAudioList().get(0);
-				messageAudioService.insert(audio);
-				am.setMessageId(audio.getId());
-			} else if (typelist[0].trim().equals(MessageType.STICKER.getValue())) {
-				MessageSticker sticker = am.getMessageStickerList().get(0);
-				messageStickerService.insert(sticker);
-				am.setMessageId(sticker.getId());
-			} else if (typelist[0].trim().equals(MessageType.LINK.getValue())) {
-				MessageTemplate messageTemplate = am.getMessageTemplateList().get(0);
-				for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
-					d.setMessageTemplate(messageTemplate);
+		try {
+			for (AutoreplyMessageList am : autoreply.getAutoreplyMessageList()) {
+				am.setAutoreply(autoreply);
+				String[] typelist = am.getMessageType().split(";");
+				if (typelist[0].trim().equals(MessageType.TEXT.getValue())) {
+					MessageText txt = am.getMessageTextList().get(0);
+					messageTextService.insert(txt);
+					am.setMessageId(txt.getId());
+				} else if (typelist[0].trim().equals(MessageType.IMAGE.getValue())) {
+					MessageImage img = am.getMessageImageList().get(0);
+					messageImageService.insert(img);
+					am.setMessageId(img.getId());
+				} else if (typelist[0].trim().equals(MessageType.VIDEO.getValue())) {
+					MessageVideo video = am.getMessageVideoList().get(0);
+					messageVideoService.insert(video);
+					am.setMessageId(video.getId());
+				} else if (typelist[0].trim().equals(MessageType.AUDIO.getValue())) {
+					MessageAudio audio = am.getMessageAudioList().get(0);
+					messageAudioService.insert(audio);
+					am.setMessageId(audio.getId());
+				} else if (typelist[0].trim().equals(MessageType.STICKER.getValue())) {
+					MessageSticker sticker = am.getMessageStickerList().get(0);
+					messageStickerService.insert(sticker);
+					am.setMessageId(sticker.getId());
+				} else if (typelist[0].trim().equals(MessageType.LINK.getValue())) {
+					MessageTemplate messageTemplate = am.getMessageTemplateList().get(0);
+					for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
+						d.setMessageTemplate(messageTemplate);
+					}
+					messageTemplateService.insert(messageTemplate);
+					am.setMessageId(messageTemplate.getId().longValue());
+					typelist[0] = MessageType.TEMPLATE.getValue();
 				}
-				messageTemplateService.insert(messageTemplate);
-				am.setMessageId(messageTemplate.getId().longValue());
-				typelist[0] = MessageType.TEMPLATE.getValue();
+				am.setOrderNum(Integer.parseInt(typelist[1], 10));
+				am.setMessageType(typelist[0].trim());
 			}
-			am.setOrderNum(Integer.parseInt(typelist[1], 10));
-			am.setMessageType(typelist[0].trim());
-		}
-		autoreply.setModificationTime(new Date());
-		autoreplyService.insert(autoreply);
+			autoreply.setModificationTime(new Date());
+			autoreplyService.insert(autoreply);
 
-		Map<String, String> mapped = new HashMap<>();
-		mapped.put(STATUS, "Success");
-		mapped.put("id", autoreply.getId().toString());
-		return mapped;
+			Map<String, String> mapped = new HashMap<>();
+			mapped.put(STATUS, "Success");
+			mapped.put("id", autoreply.getId().toString());
+			return mapped;
+		} catch (Exception e) {
+
+			Map<String, String> mapped = new HashMap<>();
+			mapped.put(STATUS, "Fail");
+			mapped.put("Exception", e.getMessage().toString());
+			return mapped;
+		}
 
 	}
 
