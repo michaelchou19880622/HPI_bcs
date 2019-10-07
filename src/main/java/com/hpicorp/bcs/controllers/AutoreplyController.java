@@ -41,8 +41,11 @@ import com.hpicorp.bcs.services.MessageTemplateService;
 import com.hpicorp.bcs.services.MessageTextService;
 import com.hpicorp.bcs.services.MessageVideoService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@Slf4j
 public class AutoreplyController {
 
 	private static final String STATUS = "status";
@@ -148,11 +151,8 @@ public class AutoreplyController {
 			mapped.put("id", autoreply.getId().toString());
 			return mapped;
 		} catch (Exception e) {
-
-			Map<String, String> mapped = new HashMap<>();
-			mapped.put(STATUS, "Fail");
-			mapped.put("Exception", e.getMessage().toString());
-			return mapped;
+			log.info("Exception = ", e);
+			
 		}
 
 	}
