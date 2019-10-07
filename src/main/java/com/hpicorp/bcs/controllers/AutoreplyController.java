@@ -144,6 +144,11 @@ public class AutoreplyController {
 				am.setMessageType(typelist[0].trim());
 			}
 			autoreply.setModificationTime(new Date());
+			
+			if (autoreply.getCreationTime() == null) {
+				autoreply.setCreationTime(new Date());
+			}
+			
 			autoreplyService.insert(autoreply);
 
 			Map<String, String> mapped = new HashMap<>();
