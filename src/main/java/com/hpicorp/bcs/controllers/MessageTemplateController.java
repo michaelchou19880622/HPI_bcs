@@ -135,7 +135,12 @@ public class MessageTemplateController {
 		return messageTemplateService.insert(messageTemplate);
 	}
 	
-	@PostMapping(path = "messageTemplate")
+	/**
+	 * 樣板訊息編輯
+	 * @param template 樣板訊息
+	 * @return
+	 */
+	@PostMapping(path = "messageTemplate/update")
 	public ResponseEntity<Object> update(@RequestBody MessageTemplate template) {
 		try {
 			template.getMessageTemplateActionList().forEach(i -> i.setMessageTemplate(template));
