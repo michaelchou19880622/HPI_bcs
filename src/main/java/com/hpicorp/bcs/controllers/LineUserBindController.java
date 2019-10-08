@@ -44,6 +44,7 @@ public class LineUserBindController {
 	@Autowired
 	LineUserRepository lineUserRepository;
 	
+	// TODO: 到時候要把邏輯的部分搬到service裡面去做 --- Michael 20191008
 	// Update a LineUser bind status
 	@PostMapping("/userStatusUpdate/{ChannelId}")
 	public ResponseEntity<?> updateLineUser(@PathVariable(value = "ChannelId") String ChannelId, @Valid @RequestBody String updateModel) {
