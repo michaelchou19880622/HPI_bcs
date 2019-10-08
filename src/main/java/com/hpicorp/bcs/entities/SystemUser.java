@@ -84,6 +84,9 @@ public class SystemUser implements Serializable {
 	@Size(max = 20)
 	@Column(name = "modify_account")
 	private String modifyAccount;
+	
+	@Column(name = "system_flag")
+	private String systemFlag;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "userroles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
