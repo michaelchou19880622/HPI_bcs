@@ -41,8 +41,11 @@ import com.hpicorp.bcs.services.MessageTemplateService;
 import com.hpicorp.bcs.services.MessageTextService;
 import com.hpicorp.bcs.services.MessageVideoService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@Slf4j
 public class AutoreplyController {
 
 	private static final String STATUS = "status";
@@ -99,12 +102,12 @@ public class AutoreplyController {
 
 	@PostMapping(path = "/autoreply/new")
 	public @ResponseBody Map<String, String> createAutoreply(@RequestBody Autoreply autoreply) {
-		
+
+		for (AutoreplyDetail d : autoreply.getAutoreplyDetails()) {
+			d.setAutoreply(autoreply);
+		}
+
 		try {
-			for (AutoreplyDetail d : autoreply.getAutoreplyDetails()) {
-				d.setAutoreply(autoreply);
-			}
-	
 			for (AutoreplyMessageList am : autoreply.getAutoreplyMessageList()) {
 				am.setAutoreply(autoreply);
 				String[] typelist = am.getMessageType().split(";");
@@ -141,18 +144,22 @@ public class AutoreplyController {
 				am.setMessageType(typelist[0].trim());
 			}
 			autoreply.setModificationTime(new Date());
+
+			if (autoreply.getCreationTime() == null) {
+				autoreply.setCreationTime(new Date());
+			}
+
 			autoreplyService.insert(autoreply);
-	
+
 			Map<String, String> mapped = new HashMap<>();
 			mapped.put(STATUS, "Success");
 			mapped.put("id", autoreply.getId().toString());
 			return mapped;
 		} catch (Exception e) {
-			Map<String, String> mapped = new HashMap<>();
-			mapped.put(STATUS, "Exception");
-			mapped.put("Exception", e.getMessage().toString());
-			return mapped;
+			log.info("Exception = ", e);
+			return null;
 		}
+		
 	}
 
 	@PutMapping("/autoreply/{id}")
