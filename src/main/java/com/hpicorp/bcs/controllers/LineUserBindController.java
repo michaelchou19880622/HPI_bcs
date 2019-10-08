@@ -24,9 +24,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hpicorp.bcs.entities.LineUser;
 import com.hpicorp.bcs.entities.dto.ApiResponse;
+import com.hpicorp.bcs.enums.LineUserBindStatus;
 import com.hpicorp.bcs.enums.LineUserStatus;
+import com.hpicorp.bcs.enums.LineUserTrackSource;
 import com.hpicorp.bcs.repositories.LineUserRepository;
 import com.hpicorp.bcs.services.LineUserService;
+import com.hpicorp.bcs.services.UserTrackService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -37,6 +40,9 @@ public class LineUserBindController {
 	
 	@Autowired
 	private LineUserService lineUserService;
+	
+	@Autowired
+	private UserTrackService userTrackService;
 
 	@Autowired
 	private com.hpicorp.bcs.config.ApProperties properties;
@@ -101,6 +107,8 @@ public class LineUserBindController {
 			logger.info("lineUser = " + lineUser);
 			
 			lineUserRepository.save(lineUser);
+			
+			userTrackService.add(Long.parseLong(strUid), strBindStatus.equals("BINDED")? LineUserTrackSource.BINDED : LineUserTrackSource.UNBINDED);
 			
 		} catch (JsonProcessingException e) {
 			return ResponseEntity.badRequest().body(e);
