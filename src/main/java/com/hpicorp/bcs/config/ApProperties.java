@@ -14,5 +14,8 @@ public class ApProperties {
 	
 	@Value("${ap.secret}")
     private String secret;
+
+	@Value("${line.channel.id}")
+	private String lineChannelId;
 	
 }

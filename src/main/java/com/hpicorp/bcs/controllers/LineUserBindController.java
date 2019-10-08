@@ -11,7 +11,6 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,11 +35,11 @@ public class LineUserBindController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(LineUserBindController.class);
 	
-	@Value("${line.channel.id}")
-	private String lineChannelId;
-	
 	@Autowired
 	private LineUserService lineUserService;
+
+	@Autowired
+	private com.hpicorp.bcs.config.ApProperties properties;
 	
 	@Autowired
 	LineUserRepository lineUserRepository;
@@ -54,9 +53,9 @@ public class LineUserBindController {
 		
 		try {
 			// Step 1. Check if ChanelID is correct? If 'not' -> return error code, message, if 'yes' -> Step 2.
-			logger.info("lineChannelId = " + lineChannelId);
+			logger.info("lineChannelId = " + properties.getLineChannelId());
 			
-			if (!ChannelId.equals(lineChannelId)) {
+			if (!ChannelId.equals(properties.getLineChannelId())) {
 				return ResponseEntity.badRequest().body(new ApiResponse(false, "Line channel id not match."));
 			}
 			
