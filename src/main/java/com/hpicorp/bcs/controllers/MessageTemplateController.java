@@ -114,55 +114,14 @@ public class MessageTemplateController {
 		return tmpList;
 	}
 
+	/**
+	 * 樣板訊息列表
+	 * @param pageable 分頁
+	 * @return
+	 */
 	@GetMapping(path = "/messageTemplate/all")
 	public Page<MessageTemplate> getAllMessageTemplate(@PageableDefault(size = 10) Pageable pageable) {
-
 		return messageTemplateService.getAllMessageTemplateByType(pageable);
-//		List<MessageCarouselTemplate> ctmplist = messageCarouselTemplateService.getAllMessageCarouselTemplate();
-//		for (MessageCarouselTemplate t : ctmplist) {
-//			MessageTemplate newtemplate = new MessageTemplate();
-//			newtemplate.setId(t.getId().intValue());
-//			newtemplate.setAltText(t.getAltText());
-//			newtemplate.setType(t.getType());
-//			MessageCarouselColumn col = t.getMessageCarouseColumnList().get(0);
-//			newtemplate.setThumbnailImageUrl(col.getThumbnailImageUrl());
-//			List<MessageTemplateAction> alist = new ArrayList<>();
-//			for (MessageCarouselAction a : col.getMessageCarouselActionList()) {
-//				MessageTemplateAction newList = new MessageTemplateAction();
-//				newList.setData(a.getData());
-//				newList.setId(a.getId());
-//				newList.setLabel(a.getLabel());
-//				newList.setTemplateType(a.getTemplateType());
-//				newList.setText(a.getText());
-//				newList.setType(a.getType());
-//				newList.setUri(a.getUri());
-//				alist.add(newList);
-//			}
-//			newtemplate.setMessageTemplateActionList(alist);
-//			tmpList.add(newtemplate);
-//		}
-//		Collections.sort(tmpList, new Comparator<MessageTemplate>() {
-//			public int compare(MessageTemplate o1, MessageTemplate o2) {
-//				if (o1.getId() > o2.getId())
-//					return -1;
-//				return o1.getId() == o2.getId() ? 0 : 1;
-//			}
-//		});
-//		int ifrom = 0;
-//		int ito = 10;
-//		if (page > 0) {
-//			ifrom = page * 10;
-//			ito = ifrom + 10;
-//		}
-//		if (ito > tmpList.size())
-//			ito = tmpList.size();
-//
-//		Map<String, Object> result = new HashMap<>();
-//		result.put("total", tmpList.size() / 10 + (tmpList.size() % 10 > 0 ? 1 : 0));
-//		result.put("number", page);
-//		result.put("totalElements", tmpList.size());
-//		result.put("content", tmpList.subList(ifrom, ito));
-//		return result;
 	}
 
 	// 20180703 Arnor, To get message id, change return type from String to
@@ -174,6 +133,18 @@ public class MessageTemplateController {
 		}
 		messageTemplate.setModifyDatetime(new Date());
 		return messageTemplateService.insert(messageTemplate);
+	}
+	
+	@PostMapping(path = "messageTemplate")
+	public ResponseEntity<Object> update(@RequestBody MessageTemplate template) {
+		try {
+			template.getMessageTemplateActionList().forEach(i -> i.setMessageTemplate(template));
+			template.setModifyDatetime(new Date());
+			messageTemplateService.insert(template);
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(e);
+		}
+		return ResponseEntity.ok().build();
 	}
 
 	@DeleteMapping("/messageTemplate/{id}")
