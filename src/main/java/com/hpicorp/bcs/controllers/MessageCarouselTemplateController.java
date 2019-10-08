@@ -75,6 +75,28 @@ public class MessageCarouselTemplateController {
 		messageCarouselTemplateService.insert(messageCarouselTemplate);
 		return "Saved";
 	}
+	
+	/**
+	 * 旋轉樣板訊息編輯
+	 * @param messageCarouselTemplate 旋轉樣板訊息
+	 * @return
+	 */
+	@PostMapping(path = "/messageCarouselTemplate/update")
+	public ResponseEntity<Object> updateMessageTemplate(@RequestBody MessageCarouselTemplate messageCarouselTemplate) {
+		try {
+			for (MessageCarouselColumn d : messageCarouselTemplate.getMessageCarouseColumnList()) {
+				d.setMessageCarouselTemplate(messageCarouselTemplate);
+				for (MessageCarouselAction col : d.getMessageCarouselActionList()) {
+					col.setMessageCarouselColumn(d);
+				}
+			}
+			messageCarouselTemplate.setModifyDatetime(new Date());
+			messageCarouselTemplateService.insert(messageCarouselTemplate);
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(e);
+		}
+		return ResponseEntity.ok().build();
+	}
 
 	@DeleteMapping("/messageCarouselTemplate/{id}")
 	public void deleteMessageImageMap(@PathVariable long id) {
