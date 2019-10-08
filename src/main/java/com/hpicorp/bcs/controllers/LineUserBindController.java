@@ -108,7 +108,7 @@ public class LineUserBindController {
 			
 			lineUserRepository.save(lineUser);
 			
-			userTrackService.add(Long.parseLong(strUid), strBindStatus.equals("BINDED")? LineUserTrackSource.BINDED : LineUserTrackSource.UNBINDED);
+			userTrackService.add(lineUser.getId(), strBindStatus.equals("BINDED")? LineUserTrackSource.BINDED : LineUserTrackSource.UNBINDED);
 			
 		} catch (JsonProcessingException e) {
 			return ResponseEntity.badRequest().body(e);
