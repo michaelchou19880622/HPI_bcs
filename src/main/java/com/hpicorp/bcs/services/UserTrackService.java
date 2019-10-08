@@ -48,6 +48,7 @@ public class UserTrackService {
 		LineUserTrack entity = new LineUserTrack();
 		entity.setUserId(userId);
 		entity.setSource(source.toString());
+		entity.setCreateTime(new Date());
 		this.lineUserTrackRepository.save(entity);
 	}
 }
