@@ -76,6 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/auth/**").permitAll()	// 登入的驗證
             .antMatchers("/line/login/**").permitAll() // Line Login 的驗證
             .antMatchers(HttpMethod.GET, "/getImageMap/*").permitAll() // 取得 ImageMap 的圖片
+            .antMatchers(HttpMethod.GET, "/getMessageTemplate/*").permitAll() // 取得 MessageTemplate 的圖片
             .antMatchers(HttpMethod.POST, "/api/userStatusUpdate/*").permitAll() // Line Binding
             .antMatchers(HttpMethod.GET, "/linkaddress/link/**").permitAll() // Link address
             .anyRequest()
