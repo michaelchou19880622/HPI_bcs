@@ -4,7 +4,9 @@ public enum LineUserBindStatus {
 
 	ALL("A"), 
 	BINDED("Y"), 
-	UNBINDED("N");
+	UNBINDED("N"),
+	STATUS_BINDED("BINDED"),
+	STATUS_UNBIND("UNBIND");
 
 	private String values;
 

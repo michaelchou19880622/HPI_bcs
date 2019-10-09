@@ -65,10 +65,10 @@ public class LineUserBindingService {
 			
 			LineUserTrackSource lineUserTrackStatus = null;
 			
-			if (LineUserTrackSource.BINDED.toString().equals(strBindStatus)) {
+			if (LineUserBindStatus.STATUS_BINDED.toString().equals(strBindStatus)) {
 				strLinked = LineUserBindStatus.BINDED.getValues();
 				lineUserTrackStatus = LineUserTrackSource.BINDED;
-			} else if (LineUserTrackSource.BINDED.toString().equals(strBindStatus)) {
+			} else if (LineUserBindStatus.STATUS_UNBIND.toString().equals(strBindStatus)) {
 				strLinked = LineUserBindStatus.UNBINDED.getValues();
 				lineUserTrackStatus = LineUserTrackSource.UNBINDED;
 			} else {
