@@ -83,4 +83,19 @@ public interface UserClickRepository extends CrudRepository<UserClick, Long> {
 	public List<String> getUidByTypeAndMappingIdAndCreateTimeBetweenSinceAndUntils(
 			@Param("type") String type, @Param("mappingId") Long mappingId, @Param("since") Date since, @Param("untils") Date untils);
 
+	
+	// 2019.10.09 已確認該 SQL 會被使用
+	@Query(value = "select date_format(c.create_time, '%Y/%m/%d') as date,  " + 
+			"		       count(c.lineuser_uid) as count, " + 
+			"		       count(DISTINCT c.lineuser_uid) as userCount " + 
+			"         from user_click c  " + 
+			"        where c.mapping_id = :id  " + 
+			"          and c.type = :type " + 
+			"          and c.create_time between :since and :untils " + 
+			"        group by date " +
+			"      order by date desc ",
+		   countQuery = "select count(DISTINCT DATE(create_time)) from user_click where mapping_id = :id and type = :type and create_time between :since and :untils ",
+		   nativeQuery = true)
+	public Page<Object[]> getAutoreplyDetailByPage(@Param("id") Long id, @Param("type") String type, @Param("since") Date since, @Param("untils") Date untils, Pageable pageable);
+	
 }
