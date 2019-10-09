@@ -37,11 +37,12 @@ public interface LinkAddressTrackRepository extends PagingAndSortingRepository<L
 				 + "		count(lineuser_id) as cnt "
 				 + "from  "
 				 + "(select DATE(create_time) DateOnly, lineuser_id, count(id) as cnt from linkaddress_track where linkaddresslist_id = :id group by DateOnly, lineuser_id) t "
-				 + "group by t.DateOnly ",
-		   countQuery = "select count(*) from linkaddress_track where linkaddresslist_id = :id",
+				 + "group by t.DateOnly "
+				 + "order by t.DateOnly desc ",
+		   countQuery = "select count(distinct DATE(create_time)) from linkaddress_track where linkaddresslist_id = :id",
 		   nativeQuery = true)
 	public Page<Object[]> getLinkAddressTrackDetailByPage(@Param("id") Long id, Pageable pageable);
-
+ 
 	@Query (value="select l.title," + 
     		"       l.url," + 
     		"	   linkaddresslist_id," + 

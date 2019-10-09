@@ -60,4 +60,7 @@ public class UserClickService {
 		return this.userClickRepository.getDistinctCountAndDateByMappingIdAndType(mappingId, type, since, untils, pageIndex, pageSize);
 	}
 	
+	public Page<Object[]> getAutoreplyByPage(Long mappingId, String type, Date since, Date untils, Pageable pageable) {
+		return this.userClickRepository.getAutoreplyDetailByPage(mappingId, type, since, untils, pageable);
+	}
 }

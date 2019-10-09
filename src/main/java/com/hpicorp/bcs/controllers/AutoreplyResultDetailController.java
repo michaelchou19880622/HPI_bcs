@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hpicorp.bcs.common.DateTimeModel;
+import com.hpicorp.bcs.entities.dto.CustomAutoreplyDetail;
 import com.hpicorp.bcs.services.AutoreplyResultModelService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,20 +40,19 @@ public class AutoreplyResultDetailController {
 	 * @return
 	 */
 	@RequestMapping(path = "/date", method = RequestMethod.GET)
-	public ResponseEntity<?> getDateDetailCountByAutoReplyId(
+	public ResponseEntity<Object> getDateDetailCountByAutoReplyId(
 			@RequestParam(value = "id", required = false) Long mappingId,
 			@RequestParam(value = "from", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") Date since,
 			@RequestParam(value = "to", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") Date untils,
-			@RequestParam(value = "page", required = false) Integer page) {
+			@PageableDefault(size = 10) Pageable pageable) {
 		if (mappingId == null) {
 			return ResponseEntity.badRequest().body("id can't be null");
 		}
-		page = (page == null) ? 0 : page;
 		try {
 			since = since == null ? DateTimeModel.initialDate() : DateTimeModel.minimizeTime(since);
 			untils = untils == null ? DateTimeModel.maximumTime(new Date()) : DateTimeModel.maximumTime(untils);
-			Map<String, Object> result = this.model.getAutoreplyDetailDateCountBy(mappingId, since, untils, page);
-			return ResponseEntity.ok(result);
+			Page<CustomAutoreplyDetail> result = this.model.getAutoreplyDetailDateCountByPage(mappingId, since, untils, pageable);
+			return ResponseEntity.ok().body(result);
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
