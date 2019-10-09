@@ -6,11 +6,13 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -47,18 +49,25 @@ public class AutoreplyMessageList implements Serializable {
 	@JsonIgnore
 	private Autoreply autoreply;
 
+    @OneToMany(fetch = FetchType.LAZY)
 	private List<MessageText> messageTextList = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY)
 	private List<MessageImage> messageImageList = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY)
 	private List<MessageVideo> messageVideoList = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY)
 	private List<MessageAudio> messageAudioList = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY)
 	private List<MessageSticker> messageStickerList = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY)
 	private List<MessageImageMap> messageImageMapList = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY)
 	private List<MessageTemplate> messageTemplateList = new ArrayList<>();
 
 }
