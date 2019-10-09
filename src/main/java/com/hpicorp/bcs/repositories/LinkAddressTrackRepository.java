@@ -37,20 +37,29 @@ public interface LinkAddressTrackRepository extends PagingAndSortingRepository<L
 				 + "		count(lineuser_id) as cnt "
 				 + "from  "
 				 + "(select DATE(create_time) DateOnly, lineuser_id, count(id) as cnt from linkaddress_track where linkaddresslist_id = :id group by DateOnly, lineuser_id) t "
-				 + "group by t.DateOnly", nativeQuery = true)
-	public List<Object[]> getLinkAddressTrackDetailByPage(@Param("id") long id);
+				 + "group by t.DateOnly ",
+		   countQuery = "select count(*) from linkaddress_track where linkaddresslist_id = :id",
+		   nativeQuery = true)
+	public Page<Object[]> getLinkAddressTrackDetailByPage(@Param("id") Long id, Pageable pageable);
 
-	@Query(value = "select "
-				 + "		l.title, "
-				 + "		l.url, "
-				 + "		linkaddresslist_id, "
-				 + "		sum(cnt) as tot, "
-				 + "		count(lineuser_id) as cnt "
-				 + "from "
-				 + "(select linkaddresslist_id, lineuser_id, count(id) as cnt from linkaddress_track group by linkaddresslist_id, lineuser_id) t , linkaddresslist l "
-				 + "where t.linkaddresslist_id = l.id and l.title like %:name% "
-				 + "group by linkaddresslist_id", nativeQuery = true)
-	public List<Object[]> getLinkAddressTrackByName(@Param("name") String name);
+	@Query (value="select l.title," + 
+    		"       l.url," + 
+    		"	   linkaddresslist_id," + 
+    		"       sum(cnt) as tot," + 
+    		"       count(lineuser_id) as cnt" + 
+    		"  from (select linkaddresslist_id," + 
+    		"			   lineuser_id," + 
+    		"               count(id) as cnt" + 
+    		"		  from linkaddress_track" + 
+    		"		 group by linkaddresslist_id," + 
+    		"				  lineuser_id) t ," + 
+    		"	    linkaddresslist l," + 
+    		"        linkaddress ld" + 
+    		"  where ld.id = l.link_id" + 
+    		"    and t.linkaddresslist_id = l.id" + 
+    		"    and l.title like %:name% " + 
+    		"  group by linkaddresslist_id", nativeQuery = true)
+	public List<Object[]>  getLinkAddressTrackByName(@Param("name") String name);
 
 	@Query(value = "select line_uid "
 				 + "from lineuser "
