@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -245,8 +247,29 @@ public class LinkAddressController {
 	 * @return
 	 */
 	@GetMapping(value = "/linkaddress/report/{id}")
-	public @ResponseBody List<CustomLinkAddressTrackDetail> getLinkAddressTrackDetail(@PathVariable Long id) {
-		return linkAddressTrackService.getLinkAddressTrackDetail(id);
+	public Page<CustomLinkAddressTrackDetail> getLinkAddressTrackDetail(@PathVariable(value="id") Long id,
+			@PageableDefault(size = 10) Pageable pageable) {
+		return linkAddressTrackService.getLinkAddressTrackDetail(id, pageable);
+	}
+	
+	/**
+	 * 追蹤連結成效用名稱搜尋 API
+	 * @param name 搜尋名稱
+	 * @param pageable 分頁
+	 * @return
+	 */
+	@GetMapping(value = "/linkaddress/report/name/{name}")
+	public @ResponseBody Page<CustomLinkAddressTrack> getLinkAddressTrackByName(@PathVariable(value="name") String name,
+			@PageableDefault(value = 10) Pageable pageable) {	
+		List<Object[]> results = linkAddressTrackService.getLinkAddressTrackByName(name);
+		List<CustomLinkAddressTrack> list = new ArrayList<>();
+		results.stream().forEach(record -> {			
+			CustomLinkAddressTrack track = new CustomLinkAddressTrack(record[0].toString(),record[1].toString(),Long.valueOf(record[2].toString()),Integer.valueOf(record[3].toString()),Integer.valueOf(record[4].toString()));
+		    list.add(track);
+		});
+		return new PageImpl<>(list,
+				PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()),
+				results.size());
 	}
 
 }

@@ -78,14 +78,18 @@ public class LinkAddressTrackService {
 	 * @param id 該筆 ID
 	 * @return
 	 */
-	public List<CustomLinkAddressTrackDetail> getLinkAddressTrackDetail(long id) {
-		List<Object[]> results = linkAddressTrackRepository.getLinkAddressTrackDetailByPage(id);
+	public Page<CustomLinkAddressTrackDetail> getLinkAddressTrackDetail(Long id, Pageable pageable) {
+		Page<Object[]> results = linkAddressTrackRepository.getLinkAddressTrackDetailByPage(id, pageable);
 		List<CustomLinkAddressTrackDetail> list = new ArrayList<>();
-		results.stream().forEach(record -> {
-			CustomLinkAddressTrackDetail detail = new CustomLinkAddressTrackDetail(record[0].toString(), Integer.valueOf(record[1].toString()), Integer.valueOf(record[2].toString()));
+		results.getContent().stream().forEach(record -> {
+			CustomLinkAddressTrackDetail detail = new CustomLinkAddressTrackDetail(record[0].toString(), 
+					                                                               Integer.valueOf(record[1].toString()), 
+					                                                               Integer.valueOf(record[2].toString()));
 			list.add(detail);
 		});
-		return list;
+		return new PageImpl<>(list,
+				results.getPageable(),
+				results.getTotalElements());
 	}
 
 }
