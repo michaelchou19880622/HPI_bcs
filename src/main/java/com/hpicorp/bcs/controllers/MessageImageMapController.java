@@ -63,12 +63,10 @@ public class MessageImageMapController {
 	public ResponseEntity<byte[]>  getMessageImageMapByID(@PathVariable Integer id) throws IOException {
 		Optional<MessageImageMap> messageImageMapOptional = messageImageMapService.findById(id);
 		String urlString =  messageImageMapOptional.get().getBaseUrl();
-		log.info("urlString = " + urlString);
 		
-		String urlExtension = urlString.substring(urlString.lastIndexOf("."));
-		log.info("urlExtension = " + urlExtension);
+		String urlExtension = urlString.substring(urlString.lastIndexOf(".") + 1);
 
-		MediaType mediaType = urlExtension.equalsIgnoreCase(".png")? MediaType.IMAGE_PNG : MediaType.IMAGE_JPEG;
+		MediaType mediaType = urlExtension.equalsIgnoreCase("png")? MediaType.IMAGE_PNG : MediaType.IMAGE_JPEG;
 		
 		BufferedImage image = null;
         try {
