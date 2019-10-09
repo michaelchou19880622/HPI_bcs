@@ -33,9 +33,12 @@ import com.hpicorp.bcs.entities.MessageImageMap;
 import com.hpicorp.bcs.entities.MessageImageMapAction;
 import com.hpicorp.bcs.services.MessageImageMapService;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@Slf4j
 public class MessageImageMapController {
 	
 	@Autowired
@@ -60,6 +63,7 @@ public class MessageImageMapController {
 	public ResponseEntity<byte[]>  getMessageImageMapByID(@PathVariable Integer id) throws IOException {
 		Optional<MessageImageMap> messageImageMapOptional = messageImageMapService.findById(id);
 		String urlString =  messageImageMapOptional.get().getBaseUrl();
+		log.info("urlString = " + urlString);
 		BufferedImage image = null;
         try {
             URL url = new URL(urlString);
@@ -78,7 +82,8 @@ public class MessageImageMapController {
 		for(MessageImageMapAction d : messageImageMap.getMessageImageMapActionList()) {
 			d.setMessageImageMap(messageImageMap);
 		}
-		messageImageMap.setBaseUrl(messageImageMap.getBaseUrl() + "?id=123");
+//		messageImageMap.setBaseUrl(messageImageMap.getBaseUrl() + "?id=123");
+		messageImageMap.setBaseUrl(messageImageMap.getBaseUrl());
 		messageImageMap.setModifyTime(new Date());
 		messageImageMapService.insert(messageImageMap);
 		return "Saved";
