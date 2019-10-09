@@ -64,6 +64,10 @@ public class MessageImageMapController {
 		Optional<MessageImageMap> messageImageMapOptional = messageImageMapService.findById(id);
 		String urlString =  messageImageMapOptional.get().getBaseUrl();
 		log.info("urlString = " + urlString);
+		
+		String urlExtension = urlString.substring(urlString.lastIndexOf("."));
+		log.info("urlExtension = " + urlExtension);
+		
 		BufferedImage image = null;
         try {
             URL url = new URL(urlString);
@@ -72,9 +76,12 @@ public class MessageImageMapController {
         		e.printStackTrace();
         }
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ImageIO.write(image, "jpg", bos );
-		byte [] bytes = bos.toByteArray();	      
-		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(bytes);	
+		ImageIO.write(image, "jpg", bos);
+		byte[] bytes = bos.toByteArray();	  
+		
+		MediaType mediaType = urlExtension.equalsIgnoreCase("png")? MediaType.IMAGE_PNG : MediaType.IMAGE_JPEG;
+		
+		return ResponseEntity.ok().contentType(mediaType).body(bytes);
 	}
 	
 	@PostMapping(path = "/messageImageMap/new") 
