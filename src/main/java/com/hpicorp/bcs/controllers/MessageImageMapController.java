@@ -67,6 +67,8 @@ public class MessageImageMapController {
 		
 		String urlExtension = urlString.substring(urlString.lastIndexOf("."));
 		log.info("urlExtension = " + urlExtension);
+
+		MediaType mediaType = urlExtension.equalsIgnoreCase(".png")? MediaType.IMAGE_PNG : MediaType.IMAGE_JPEG;
 		
 		BufferedImage image = null;
         try {
@@ -76,10 +78,11 @@ public class MessageImageMapController {
         		e.printStackTrace();
         }
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ImageIO.write(image, "jpg", bos);
-		byte[] bytes = bos.toByteArray();	  
 		
-		MediaType mediaType = urlExtension.equalsIgnoreCase("png")? MediaType.IMAGE_PNG : MediaType.IMAGE_JPEG;
+		String srcType = (mediaType == MediaType.IMAGE_PNG)? "png" : "jpg";
+		
+		ImageIO.write(image, srcType, bos);
+		byte[] bytes = bos.toByteArray();	  
 		
 		return ResponseEntity.ok().contentType(mediaType).body(bytes);
 	}
