@@ -62,9 +62,11 @@ public class MessageImageMapController {
 	@RequestMapping(path = "/getImageMap/{id}", method = RequestMethod.GET)
 	public ResponseEntity<byte[]>  getMessageImageMapByID(@PathVariable Integer id) throws IOException {
 		Optional<MessageImageMap> messageImageMapOptional = messageImageMapService.findById(id);
-		String urlString =  messageImageMapOptional.get().getBaseUrl();
+		String urlString =  messageImageMapOptional.get().getBaseUrl().replace("?id=123", "");
+		log.info("urlString = {}", urlString);
 		
 		String urlExtension = urlString.substring(urlString.lastIndexOf(".") + 1);
+		log.info("urlExtension = {}", urlExtension);
 
 		MediaType mediaType = urlExtension.equalsIgnoreCase("png")? MediaType.IMAGE_PNG : MediaType.IMAGE_JPEG;
 		
@@ -90,8 +92,8 @@ public class MessageImageMapController {
 		for(MessageImageMapAction d : messageImageMap.getMessageImageMapActionList()) {
 			d.setMessageImageMap(messageImageMap);
 		}
-//		messageImageMap.setBaseUrl(messageImageMap.getBaseUrl() + "?id=123");
-		messageImageMap.setBaseUrl(messageImageMap.getBaseUrl());
+		messageImageMap.setBaseUrl(messageImageMap.getBaseUrl() + "?id=123");
+//		messageImageMap.setBaseUrl(messageImageMap.getBaseUrl());
 		messageImageMap.setModifyTime(new Date());
 		messageImageMapService.insert(messageImageMap);
 		return "Saved";
