@@ -93,9 +93,22 @@ public interface UserClickRepository extends CrudRepository<UserClick, Long> {
 			"          and c.type = :type " + 
 			"          and c.create_time between :since and :untils " + 
 			"        group by date " +
-			"      order by date desc ",
+			"        order by date desc ",
 		   countQuery = "select count(DISTINCT DATE(create_time)) from user_click where mapping_id = :id and type = :type and create_time between :since and :untils ",
 		   nativeQuery = true)
 	public Page<Object[]> getAutoreplyDetailByPage(@Param("id") Long id, @Param("type") String type, @Param("since") Date since, @Param("untils") Date untils, Pageable pageable);
+	
+	// 匯出關鍵字觸發成效CSV (非分頁)
+	@Query(value = "select date_format(c.create_time, '%Y/%m/%d') as date,  " + 
+			"		       count(c.lineuser_uid) as count, " + 
+			"		       count(DISTINCT c.lineuser_uid) as userCount " + 
+			"         from user_click c  " + 
+			"        where c.mapping_id = :id  " + 
+			"          and c.type = :type " + 
+			"          and c.create_time between :since and :untils " + 
+			"        group by date " +
+			"        order by date desc ",
+		   nativeQuery = true)
+	public List<Object[]> getAutoreplyDetailByList(@Param("id") Long id, @Param("type") String type, @Param("since") Date since, @Param("untils") Date untils);
 	
 }

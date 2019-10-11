@@ -31,6 +31,9 @@ public interface LinkAddressTrackRepository extends PagingAndSortingRepository<L
 	public Page<Object[]> getLinkAddressTrackByPage(Pageable pageable);
 	
 	// 2019.10.6 已確認該 SQL 會被使用
+	/**
+	 * 撈取該追蹤連結所有點擊數據(分頁)
+	 */
 	@Query(value = "select "
 				 + "		t.DateOnly as date, "
 				 + "		sum(cnt) as tot, "
@@ -42,6 +45,24 @@ public interface LinkAddressTrackRepository extends PagingAndSortingRepository<L
 		   countQuery = "select count(distinct DATE(create_time)) from linkaddress_track where linkaddresslist_id = :id",
 		   nativeQuery = true)
 	public Page<Object[]> getLinkAddressTrackDetailByPage(@Param("id") Long id, Pageable pageable);
+	
+	/**
+	 * 撈取該追蹤連結所有點擊數據(不分頁)
+	 * @param linkaddress_list_id
+	 */
+	@Query(value = "select t.DateOnly as date, "
+			 + "		   sum(cnt) as tot, "
+			 + "		   count(lineuser_id) as cnt "
+			 + "      from (select DATE(create_time) DateOnly, "
+			 + "                   lineuser_id, "
+			 + "                   count(id) as cnt"
+			 + "              from linkaddress_track "
+			 + "             where linkaddresslist_id = :id "
+			 + "             group by DateOnly, lineuser_id ) t "
+			 + "      group by t.DateOnly "
+			 + "      order by t.DateOnly desc ",
+	   nativeQuery = true)
+	public List<Object[]> getLinkAddressTrackDetailByList(@Param("id") Long id);
  
 	@Query (value="select l.title," + 
     		"       l.url," + 
@@ -62,9 +83,12 @@ public interface LinkAddressTrackRepository extends PagingAndSortingRepository<L
     		"  group by linkaddresslist_id", nativeQuery = true)
 	public List<Object[]>  getLinkAddressTrackByName(@Param("name") String name);
 
-	@Query(value = "select line_uid "
-				 + "from lineuser "
-				 + "where id in "
-				 + "		( select distinct lineuser_id from linkaddress_track where linkaddresslist_id = :id group by lineuser_id )", nativeQuery = true)
-	public List<String> getTrackDetailBylinkaddresslist_id(@Param("id") long id);
+	@Query(value = "select line_uid " + 
+			"         from lineuser " + 
+			"        where id in ( select distinct lineuser_id " + 
+			"                        from linkaddress_track " + 
+			"                       where linkaddresslist_id = :id" + 
+			"                       group by lineuser_id )", nativeQuery = true)
+	public List<String> getTrackDetailUidBylinkaddresslistId(@Param("id") Long id);
+
 }

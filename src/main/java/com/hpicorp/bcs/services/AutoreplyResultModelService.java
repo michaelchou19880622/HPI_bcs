@@ -1,12 +1,15 @@
 package com.hpicorp.bcs.services;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import com.hpicorp.bcs.common.CsvGenerator;
 import com.hpicorp.bcs.entities.dto.AutoreplyResultBody;
 import com.hpicorp.bcs.entities.dto.CustomAutoreplyDetail;
 import com.hpicorp.bcs.entities.dto.CustomLinkAddressTrackDetail;
@@ -143,6 +147,31 @@ public class AutoreplyResultModelService {
 		return new PageImpl<>(list,
 				results.getPageable(),
 				results.getTotalElements());
+	}
+
+	public void exportUidByAutoreplyIdAndBetweenDate(Long mappingId, Date since, Date untils,HttpServletResponse response) {
+		List<List<Object>> result = new ArrayList<>();
+		String[] header = {"UID"};
+		List<String> uidList = this.userClickService.getUidByTypeAndMappingBetweenDate(UserClickType.AUTOREPLY.toString(), mappingId, since, untils);
+		for (String uid : uidList) {
+			result.add(Arrays.asList(uid));
+		}
+		CsvGenerator.writeWithResponse(response, header, result);
+		
+	}
+
+	public void exportCsvByAutoreplyIdAndBetweenDate(Long mappingId, Date since, Date untils,
+			HttpServletResponse response) {
+		List<List<Object>> result = new ArrayList<>();
+		String[] header = { "回覆日期", "回應次數", "回應人數"};
+		List<Object[]> detailList = this.userClickService.getAutoreplyByList(mappingId, UserClickType.AUTOREPLY.toString(), since, untils);
+		for (Object[] reportBody : detailList) {
+			result.add(Arrays.asList(reportBody[0].toString(),
+									 reportBody[1].toString(),
+									 reportBody[2].toString())
+					                 );
+		}
+		CsvGenerator.writeWithResponse(response, header, result);
 	}
 	
 }
