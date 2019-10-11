@@ -1,8 +1,11 @@
 package com.hpicorp.bcs.services;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.hpicorp.bcs.common.CsvGenerator;
 import com.hpicorp.bcs.entities.LinkAddressTrack;
 import com.hpicorp.bcs.entities.dto.CustomLinkAddressTrack;
 import com.hpicorp.bcs.entities.dto.CustomLinkAddressTrackDetail;
@@ -53,10 +57,6 @@ public class LinkAddressTrackService {
 	public List<Object[]> getLinkAddressTrackByName(String name) {
 		return linkAddressTrackRepository.getLinkAddressTrackByName(name);
 	}
-
-	public List<String> getTrackDetailBylinkaddresslist_id(long id) {
-		return linkAddressTrackRepository.getTrackDetailBylinkaddresslist_id(id);
-	}
 	
 	/**
 	 * 追蹤連結成效列表
@@ -91,5 +91,36 @@ public class LinkAddressTrackService {
 				results.getPageable(),
 				results.getTotalElements());
 	}
+
+	/**
+	 * 單筆追蹤連結點擊成效 匯出報表
+	 * @param id
+	 * @param response
+	 */
+	public void exportDetailReportByLinkAddressListId(Long id, HttpServletResponse response) {
+		List<List<Object>> result = new ArrayList<>();
+		String[] header = { "日期", "點擊次數", "點擊人數"};
+		List<Object[]> detailList = this.linkAddressTrackRepository.getLinkAddressTrackDetailByList(id);
+		for (Object[] reportBody : detailList) {
+			result.add(Arrays.asList(reportBody[0].toString(),
+									 reportBody[1].toString(),
+									 reportBody[2].toString())
+					                 );
+		}
+		CsvGenerator.writeWithResponse(response, header, result);
+		
+	}
+
+	public void exportDetailUidReportByLinkAddressListId(Long id, HttpServletResponse response) {
+		List<List<Object>> result = new ArrayList<>();
+		String[] header = {"UID"};
+		List<String> uidList = this.linkAddressTrackRepository.getTrackDetailUidBylinkaddresslistId(id);
+		for (String uid : uidList) {
+			result.add(Arrays.asList(uid));
+		}
+		CsvGenerator.writeWithResponse(response, header, result);
+		
+	}
+	
 
 }

@@ -22,7 +22,7 @@ public class UserClickService {
 	@Autowired
 	private UserClickRepository userClickRepository;
 	
-	public List<String> getUidByTypeAndMappingBetweenDate(String type, Long mappingId, Date since, Date untils) throws Exception{
+	public List<String> getUidByTypeAndMappingBetweenDate(String type, Long mappingId, Date since, Date untils) {
 		return this.userClickRepository.getUidByTypeAndMappingIdAndCreateTimeBetweenSinceAndUntils(type, mappingId, since, untils);
 	}
 	
@@ -62,5 +62,9 @@ public class UserClickService {
 	
 	public Page<Object[]> getAutoreplyByPage(Long mappingId, String type, Date since, Date untils, Pageable pageable) {
 		return this.userClickRepository.getAutoreplyDetailByPage(mappingId, type, since, untils, pageable);
+	}
+	
+	public List<Object[]> getAutoreplyByList(Long mappingId, String type, Date since, Date untils) {
+		return this.userClickRepository.getAutoreplyDetailByList(mappingId, type, since, untils);
 	}
 }

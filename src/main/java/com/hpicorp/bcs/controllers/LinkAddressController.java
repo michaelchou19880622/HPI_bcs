@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -170,19 +172,7 @@ public class LinkAddressController {
 	private boolean checkIsMobile(Device device) {
 		return device.isMobile();
 	}
-
-	@GetMapping(value = "/linkaddress/report/getuids/{id}")
-	public @ResponseBody List<Map<String, String>> getTrackDetailBylinkaddresslistId(@PathVariable long id) {
-		List<String> uidList = linkAddressTrackService.getTrackDetailBylinkaddresslist_id(id);
-		List<Map<String, String>> result = new ArrayList<>();
-		for (String uid : uidList) {
-			Map<String, String> mapped = new HashMap<>();
-			mapped.put("UID", uid);
-			result.add(mapped);
-		}
-		return result;
-	}
-
+	
 	@RequestMapping("/linkaddress/{id}")
 	public RedirectView redirectToLIFF(@PathVariable long id) {
 		String projectUrl = "line://app/1562106995-1rNpOLKq?linkaddress=" + id;
@@ -270,6 +260,32 @@ public class LinkAddressController {
 		return new PageImpl<>(list,
 				PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()),
 				results.size());
+	}
+	
+	/**
+	 * 匯出該筆追蹤連結的所有點擊uid
+	 * @param id
+	 * @param response
+	 * @return
+	 */
+	@GetMapping(value = "/linkaddress/report/getuids/{id}")
+	public ResponseEntity<Object> exportDetailUidReportByLinkAddressListId(@PathVariable(value="id") Long id,
+			HttpServletResponse response) {
+		this.linkAddressTrackService.exportDetailUidReportByLinkAddressListId(id, response);
+		return ResponseEntity.ok().build();
+	}
+	
+	/**
+	 * 匯出該筆追蹤連結所有點擊成效(不分頁)
+	 * @param id
+	 * @param response
+	 * @return
+	 */
+	@GetMapping(value = "/linkaddress/report/csv/{id}")
+	public ResponseEntity<Object> exportDetailReportByLinkAddressListId(@PathVariable(value="id") Long id,
+			HttpServletResponse response) {
+		this.linkAddressTrackService.exportDetailReportByLinkAddressListId(id, response);
+		return ResponseEntity.ok().build();
 	}
 
 }
