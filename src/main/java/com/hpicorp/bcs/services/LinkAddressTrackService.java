@@ -66,11 +66,11 @@ public class LinkAddressTrackService {
 	public Page<CustomLinkAddressTrack> getLinkAddressTrackBypage(Pageable pageable) {
 		Page<Object[]> results = linkAddressTrackRepository.getLinkAddressTrackByPage(pageable);
 		List<CustomLinkAddressTrack> list = new ArrayList<>();
-		results.stream().forEach(record -> {			
-			CustomLinkAddressTrack track = new CustomLinkAddressTrack(record[0].toString(),record[1].toString(),Long.valueOf(record[2].toString()),Integer.valueOf(record[3].toString()),Integer.valueOf(record[4].toString()));
+		results.getContent().stream().forEach(record -> {
+			CustomLinkAddressTrack track = new CustomLinkAddressTrack(record[1].toString(), record[2].toString(), Long.valueOf(record[3].toString()), Integer.valueOf(record[4].toString()), Integer.valueOf(record[0].toString()));
 		    list.add(track);
 		});
-		return new PageImpl<>(list, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()), results.getSize());
+		return new PageImpl<>(list, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()), results.getTotalElements());
 	}
 	
 	/**

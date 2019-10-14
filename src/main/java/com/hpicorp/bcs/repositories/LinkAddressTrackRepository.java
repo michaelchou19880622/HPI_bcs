@@ -4,30 +4,30 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.hpicorp.bcs.entities.LinkAddressTrack;
 
 @Repository
-public interface LinkAddressTrackRepository extends PagingAndSortingRepository<LinkAddressTrack, Long> {
+public interface LinkAddressTrackRepository extends JpaRepository<LinkAddressTrack, Long> {
 
 	@Query(value = "select linked from lineuser_link where user_id= :userid ", nativeQuery = true)
 	public String getLinkedByUserID(@Param("userid") long userid);
 
 	// 2019.10.6 已確認該 SQL 會被使用
-	@Query(value = "select "
-				 + "		l.title as title, "
-				 + "		l.url as url, "
-				 + "		linkaddresslist_id as linkAddressListId, "
-				 + "		sum(cnt) as tot, "
-				 + "		count(lineuser_id) as cnt "
-				 + "from "
-				 + "(select linkaddresslist_id, lineuser_id, count(id) as cnt from linkaddress_track group by linkaddresslist_id, lineuser_id) t , linkaddresslist l "
-				 + "where t.linkaddresslist_id = l.id " 
-				 + "group by linkaddresslist_id", nativeQuery = true)
+	@Query(value = "select " 
+				 + "		count(distinct lineuser_id) as cnt, " 
+				 + "		ll.title as title, " 
+				 + "		ll.url as url, " 
+				 + "		ll.id as linkAddressListId, " 
+				 + "		count(linkaddresslist_id) as tot " 
+				 + "from linkaddress_track join linkaddresslist ll on linkaddresslist_id = ll.id " 
+				 + "group by linkaddresslist_id ", 
+				 countQuery = "select count(linkaddresslist_id) from linkaddress_track group by linkaddresslist_id",
+				 nativeQuery = true)
 	public Page<Object[]> getLinkAddressTrackByPage(Pageable pageable);
 	
 	// 2019.10.6 已確認該 SQL 會被使用
