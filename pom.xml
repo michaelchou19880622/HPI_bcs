@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hpicorp</groupId>
-	<artifactId>Dominos_bcs</artifactId>
+	<artifactId>bcs</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>Dominos_bcs</name>
+	<name>bcs</name>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
