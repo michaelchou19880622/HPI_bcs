@@ -6,9 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +19,6 @@ import org.springframework.stereotype.Service;
 import com.hpicorp.bcs.common.CsvGenerator;
 import com.hpicorp.bcs.entities.dto.AutoreplyResultBody;
 import com.hpicorp.bcs.entities.dto.CustomAutoreplyDetail;
-import com.hpicorp.bcs.entities.dto.CustomLinkAddressTrackDetail;
 import com.hpicorp.bcs.enums.DefaultConfig;
 import com.hpicorp.bcs.enums.UserClickType;
 
@@ -32,38 +28,10 @@ public class AutoreplyResultModelService {
 	
 	@Autowired
 	private UserClickService userClickDao;
-
-	@Autowired
-	private AutoreplyService autoreplyDao;
 	
 	@Autowired
 	private UserClickService userClickService;
 	
-//	public Map<String, Object> getAutoreplyDetailDateCountBy(Long mappingId, Date since, Date untils, Integer page) throws Exception {
-//		String type = UserClickType.AUTOREPLY.toString();
-//		Map<String, Object> result = new HashMap<>();
-//		Map<String, Object> resultContent = new HashMap<>();
-//		Integer allPage = this.userClickDao.getDateCountPageBy(mappingId, type, since, untils);
-//		List<Map<String, String>> sumContentList = this.userClickDao.getDateAndCountBy(mappingId, type, since, untils, page);
-//		List<Map<String, String>> countContentList = this.userClickDao.getDistinctCountCountAndDateBy(mappingId, type, since, untils, page);
-//		Map<String, Integer> sumContent = this.setKeyDateAndIntegerValue(sumContentList);
-//		Map<String, Integer> countContent = this.setKeyDateAndIntegerValue(countContentList);
-//		String keyword = this.autoreplyDao.getKeywordById(mappingId);
-//		for (Entry<String, Integer> entry : sumContent.entrySet()) {
-//			Map<String, Integer> content = new HashMap<>();
-//			String key = entry.getKey();
-//			Integer sum = entry.getValue();
-//			Integer count = countContent.get(key) == null ? 0 : countContent.get(key);
-//			content.put("sum", sum);
-//			content.put("count", count);
-//			resultContent.put(key, content);
-//		}
-//		result.put("title", keyword);
-//		result.put("total", allPage);
-//		result.put("page", page);
-//		result.put("content", new TreeMap<>(resultContent));
-//		return result;
-//	}
 	
 	public Map<String, Object> getByAutoreplyResultBody(AutoreplyResultBody body) throws Exception {
 		if (body == null) {
@@ -111,21 +79,6 @@ public class AutoreplyResultModelService {
 		result.put("page", content.getNumber());
 		result.put("content", resultContent);
 		return result;
-	}
-	
-	private Map<String, Integer> setKeyDateAndIntegerValue(List<Map<String, String>> content) {
-		Map<String, Integer> resultContent = new HashMap<String, Integer>();
-		for (Map<String, String> map : content) {
-			try {
-				String key = String.valueOf(map.get("date"));
-				String tmpCount = String.valueOf(map.get("count"));
-				Integer count = Integer.parseInt(tmpCount);
-				resultContent.put(key, count);
-			} catch (Exception e) {
-				continue;
-			}
-		}
-		return resultContent;
 	}
 	
 	public List<String> getUidByMappingIdAndBetweenDate(Long mappingId, Date since, Date untils) throws Exception {

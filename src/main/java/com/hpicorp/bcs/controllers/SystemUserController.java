@@ -41,11 +41,21 @@ public class SystemUserController {
 	@Autowired
     PasswordEncoder passwordEncoder;
 	
+	/**
+	 * [Read List]系統使用者
+	 * @param pageable
+	 * @return Page
+	 */
 	@GetMapping("")
 	public Page<SystemUser> getAllSystemUser(@PageableDefault(value = 10) Pageable pageable) {
 	    return systemUserRepository.findAll(pageable);
 	}
 	
+	/**
+	 * [Create]系統使用者
+	 * @param systemUser
+	 * @return ResponseEntity
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostMapping("/new")
 	public ResponseEntity<Object> createSystemUser(@Valid @RequestBody SystemUser systemUser) {
@@ -65,14 +75,25 @@ public class SystemUserController {
 		return ResponseEntity.ok().build();
 	}
 	
-	// Get a SystemUser
+	/**
+	 * [Read]系統使用者
+	 * @param systemUserId
+	 * @return SystemUser
+	 * @throws Exception
+	 */
 	@GetMapping("/acc/id/{id}")
 	public SystemUser getSystemUserById(@PathVariable(value = "id") Long systemUserId) throws Exception {
 		return systemUserRepository.findById(systemUserId)
 	            .orElseThrow(() -> new Exception("SystemUser error => " + systemUserId));
 	}
 	
-	// Update a SystemUser
+	/**
+	 * [Update]系統使用者
+	 * @param systemUserId
+	 * @param systemUserDetails
+	 * @return SystemUser
+	 * @throws Exception
+	 */
 	@PutMapping("/{id}")
 	public SystemUser updateSystemUser(@PathVariable(value = "id") Long systemUserId, @Valid @RequestBody SystemUser systemUserDetails) throws Exception {
 
@@ -90,6 +111,12 @@ public class SystemUserController {
 	    return systemUserRepository.save(systemUser);
 	}
 	
+	/**
+	 * [Delete]系統使用者
+	 * @param systemUserId
+	 * @return ResponseEntity
+	 * @throws Exception
+	 */
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Object> deleteSystemUser(@PathVariable(value = "id") Long systemUserId) throws Exception {
 		SystemUser systemUser = systemUserRepository.findById(systemUserId)
@@ -98,6 +125,12 @@ public class SystemUserController {
 	    return ResponseEntity.ok().build();
 	}
 	
+	/**
+	 * [Header][Nav] 用帳號取得系統使用者資料
+	 * @param account
+	 * @return SystemUser
+	 * @throws Exception
+	 */
 	@GetMapping("/acc/{account}")
 	public SystemUser getSystemUserByAccount(@PathVariable(value = "account") String account) throws Exception {
 		return systemUserRepository.findByAccount(account)

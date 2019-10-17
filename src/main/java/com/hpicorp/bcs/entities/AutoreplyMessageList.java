@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -49,25 +50,25 @@ public class AutoreplyMessageList implements Serializable {
 	@JsonIgnore
 	private Autoreply autoreply;
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@Transient
 	private List<MessageText> messageTextList = new ArrayList<>();
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@Transient
 	private List<MessageImage> messageImageList = new ArrayList<>();
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@Transient
 	private List<MessageVideo> messageVideoList = new ArrayList<>();
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@Transient
 	private List<MessageAudio> messageAudioList = new ArrayList<>();
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@Transient
 	private List<MessageSticker> messageStickerList = new ArrayList<>();
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@Transient
 	private List<MessageImageMap> messageImageMapList = new ArrayList<>();
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@Transient
 	private List<MessageTemplate> messageTemplateList = new ArrayList<>();
 
 }
