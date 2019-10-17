@@ -36,7 +36,7 @@ public class SendMessageList implements Serializable {
 	private Long sendId;
 
 	@Column(name = "message_id")
-	private Integer messageId;
+	private Long messageId;
 
 	@Column(name = "message_type")
 	private String messageType;

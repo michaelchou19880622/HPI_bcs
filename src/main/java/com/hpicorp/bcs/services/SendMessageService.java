@@ -144,30 +144,30 @@ public class SendMessageService {
 			if (typelist[0].trim().equals(MessageType.TEXT.getValue())) {
 				MessageText txt = sendMessageList.getMessageTextList().get(0);
 				messageTextService.insert(txt);
-				sendMessageList.setMessageId(Integer.parseInt(txt.getId().toString()));
+				sendMessageList.setMessageId(txt.getId());
 			} else if (typelist[0].trim().equals(MessageType.IMAGE.getValue())) {
 				MessageImage img = sendMessageList.getMessageImageList().get(0);
 				messageImageService.insert(img);
-				sendMessageList.setMessageId(Integer.parseInt(img.getId().toString()));
+				sendMessageList.setMessageId(img.getId());
 			} else if (typelist[0].trim().equals(MessageType.VIDEO.getValue())) {
 				MessageVideo video = sendMessageList.getMessageVideoList().get(0);
 				messageVideoService.insert(video);
-				sendMessageList.setMessageId(Integer.parseInt(video.getId().toString()));
+				sendMessageList.setMessageId(video.getId());
 			} else if (typelist[0].trim().equals(MessageType.AUDIO.getValue())) {
 				MessageAudio audio = sendMessageList.getMessageAudioList().get(0);
 				messageAudioService.insert(audio);
-				sendMessageList.setMessageId(Integer.parseInt(audio.getId().toString()));
+				sendMessageList.setMessageId(audio.getId());
 			} else if (typelist[0].trim().equals(MessageType.STICKER.getValue())) {
 				MessageSticker sticker = sendMessageList.getMessageStickerList().get(0);
 				messageStickerService.insert(sticker);
-				sendMessageList.setMessageId(Integer.parseInt(sticker.getId().toString()));
+				sendMessageList.setMessageId(sticker.getId());
 			} else if (typelist[0].trim().equals(MessageType.LINK.getValue())) {
 				MessageTemplate messageTemplate = sendMessageList.getMessageTemplateList().get(0);
 				for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
 					d.setMessageTemplate(messageTemplate);
 				}
 				messageTemplateService.insert(messageTemplate);
-				sendMessageList.setMessageId(Integer.parseInt(messageTemplate.getId().toString()));
+				sendMessageList.setMessageId(messageTemplate.getId());
 				typelist[0] = MessageType.TEMPLATE.getValue();
 			}
 			sendMessageList.setOrderIndex(Integer.parseInt(typelist[1], 10));

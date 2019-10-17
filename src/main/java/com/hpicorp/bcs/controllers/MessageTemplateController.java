@@ -55,7 +55,7 @@ public class MessageTemplateController {
 	private MessageCarouselTemplateService messageCarouselTemplateService;
 
 	@RequestMapping(path = "/getMessageTemplate/{id}", method = RequestMethod.GET)
-	public ResponseEntity<byte[]> getMessageImageMapByID(@PathVariable Integer id) throws IOException {
+	public ResponseEntity<byte[]> getMessageImageMapByID(@PathVariable Long id) throws IOException {
 		Optional<MessageTemplate> messageTemplateOptional = messageTemplateService.findById(id);
 
 		BufferedImage image = null;
@@ -83,7 +83,7 @@ public class MessageTemplateController {
 		List<MessageCarouselTemplate> ctmplist = messageCarouselTemplateService.getAllMessageCarouselTemplate();
 		for (MessageCarouselTemplate t : ctmplist) {
 			MessageTemplate newtemplate = new MessageTemplate();
-			newtemplate.setId(t.getId().intValue());
+			newtemplate.setId(t.getId());
 			newtemplate.setAltText(t.getAltText());
 			newtemplate.setType(t.getType());
 			MessageCarouselColumn col = t.getMessageCarouseColumnList().get(0);
@@ -158,7 +158,7 @@ public class MessageTemplateController {
 	}
 
 	@PutMapping("/messageTemplate/{id}")
-	public @ResponseBody String updateMessageImageMap(@RequestBody MessageTemplate messageTemplate, @PathVariable Integer id) {
+	public @ResponseBody String updateMessageImageMap(@RequestBody MessageTemplate messageTemplate, @PathVariable Long id) {
 		Optional<MessageTemplate> messageImageMapOptional = messageTemplateService.findById(id);
 		if (!messageImageMapOptional.isPresent()) {
 			return "Nodata [" + id + "]";

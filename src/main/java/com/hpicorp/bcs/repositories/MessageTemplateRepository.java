@@ -14,12 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hpicorp.bcs.entities.MessageTemplate;
 
 @Repository
-public interface MessageTemplateRepository extends PagingAndSortingRepository<MessageTemplate, Integer> {
+public interface MessageTemplateRepository extends PagingAndSortingRepository<MessageTemplate, Long> {
 
 	@Modifying
 	@Transactional
 	@Query(value = "delete from message_template_action where template_id = :templateId ", nativeQuery = true)
-	public void deleteByTemplateID(@Param("templateId") long templateId);
+	public void deleteByTemplateID(@Param("templateId") Long templateId);
 
 	@Query(value = "select M from MessageTemplate M order by M.id desc ")
 	public List<MessageTemplate> getMessageTeamplateByType();

@@ -27,7 +27,7 @@ public class MessageTemplate implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Column(name = "type")
 	private String type;

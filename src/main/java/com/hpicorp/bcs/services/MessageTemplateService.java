@@ -37,12 +37,12 @@ public class MessageTemplateService {
 		messageTemplateRepository.save(messageTemplate);
 	}
 
-	public Optional<MessageTemplate> findById(Integer id) {
+	public Optional<MessageTemplate> findById(Long id) {
 		return messageTemplateRepository.findById(id);
 	}
 
 	public void deleteById(Long id) {
-		messageTemplateRepository.deleteById(id.intValue());
+		messageTemplateRepository.deleteById(id);
 	}
 
 	public void deleteByTemplateID(long id) {

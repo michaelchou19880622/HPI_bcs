@@ -26,10 +26,10 @@ public class MessageCarouselAction implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Column(name = "column_id", insertable = false, updatable = false)
-	private Integer columnId;
+	private Long columnId;
 
 	@Column(name = "template_type")
 	private String templateType;

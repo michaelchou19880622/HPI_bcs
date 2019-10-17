@@ -152,23 +152,23 @@ public class SendMessageController {
 			if (typelist[0].trim().equals(MessageType.TEXT.getValue())) {
 				MessageText txt = am.getMessageTextList().get(0);
 				messageTextService.insert(txt);
-				am.setMessageId(Integer.parseInt(txt.getId().toString()));
+				am.setMessageId(txt.getId());
 			} else if (typelist[0].trim().equals(MessageType.IMAGE.getValue())) {
 				MessageImage img = am.getMessageImageList().get(0);
 				messageImageService.insert(img);
-				am.setMessageId(Integer.parseInt(img.getId().toString()));
+				am.setMessageId(img.getId());
 			} else if (typelist[0].trim().equals(MessageType.VIDEO.getValue())) {
 				MessageVideo video = am.getMessageVideoList().get(0);
 				messageVideoService.insert(video);
-				am.setMessageId(Integer.parseInt(video.getId().toString()));
+				am.setMessageId(video.getId());
 			} else if (typelist[0].trim().equals(MessageType.AUDIO.getValue())) {
 				MessageAudio audio = am.getMessageAudioList().get(0);
 				messageAudioService.insert(audio);
-				am.setMessageId(Integer.parseInt(audio.getId().toString()));
+				am.setMessageId(audio.getId());
 			} else if (typelist[0].trim().equals(MessageType.STICKER.getValue())) {
 				MessageSticker sticker = am.getMessageStickerList().get(0);
 				messageStickerService.insert(sticker);
-				am.setMessageId(Integer.parseInt(sticker.getId().toString()));
+				am.setMessageId(sticker.getId());
 			} else if (typelist[0].trim().equals(MessageType.LINK.getValue())) {
 				MessageTemplate messageTemplate = am.getMessageTemplateList().get(0);
 				for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
@@ -176,7 +176,7 @@ public class SendMessageController {
 					d.setMessageTemplate(messageTemplate);
 				}
 				messageTemplateService.insert(messageTemplate);
-				am.setMessageId(Integer.parseInt(messageTemplate.getId().toString()));
+				am.setMessageId(messageTemplate.getId());
 				typelist[0] = MessageType.TEMPLATE.getValue();
 			}
 			am.setOrderIndex(Integer.parseInt(typelist[1], 10));
@@ -259,30 +259,30 @@ public class SendMessageController {
 			if (typelist[0].trim().equals(MessageType.TEXT.getValue())) {
 				MessageText txt = am.getMessageTextList().get(0);
 				messageTextService.insert(txt);
-				am.setMessageId(Integer.parseInt(txt.getId().toString()));
+				am.setMessageId(txt.getId());
 			} else if (typelist[0].trim().equals(MessageType.IMAGE.getValue())) {
 				MessageImage img = am.getMessageImageList().get(0);
 				messageImageService.insert(img);
-				am.setMessageId(Integer.parseInt(img.getId().toString()));
+				am.setMessageId(img.getId());
 			} else if (typelist[0].trim().equals(MessageType.VIDEO.getValue())) {
 				MessageVideo video = am.getMessageVideoList().get(0);
 				messageVideoService.insert(video);
-				am.setMessageId(Integer.parseInt(video.getId().toString()));
+				am.setMessageId(video.getId());
 			} else if (typelist[0].trim().equals(MessageType.AUDIO.getValue())) {
 				MessageAudio audio = am.getMessageAudioList().get(0);
 				messageAudioService.insert(audio);
-				am.setMessageId(Integer.parseInt(audio.getId().toString()));
+				am.setMessageId(audio.getId());
 			} else if (typelist[0].trim().equals(MessageType.STICKER.getValue())) {
 				MessageSticker sticker = am.getMessageStickerList().get(0);
 				messageStickerService.insert(sticker);
-				am.setMessageId(Integer.parseInt(sticker.getId().toString()));
+				am.setMessageId(sticker.getId());
 			} else if (typelist[0].trim().equals(MessageType.LINK.getValue())) {
 				MessageTemplate messageTemplate = am.getMessageTemplateList().get(0);
 				for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
 					d.setMessageTemplate(messageTemplate);
 				}
 				messageTemplateService.insert(messageTemplate);
-				am.setMessageId(Integer.parseInt(messageTemplate.getId().toString()));
+				am.setMessageId(messageTemplate.getId());
 				typelist[0] = MessageType.TEMPLATE.getValue();
 			} else if (typelist[0].trim().equals(MessageType.TEMPLATE.getValue())) {
 				for (SendMessageList am1 : list) {

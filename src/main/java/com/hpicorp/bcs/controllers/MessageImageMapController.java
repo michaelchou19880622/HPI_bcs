@@ -60,7 +60,7 @@ public class MessageImageMapController {
 	}	
 	
 	@RequestMapping(path = "/getImageMap/{id}", method = RequestMethod.GET)
-	public ResponseEntity<byte[]>  getMessageImageMapByID(@PathVariable Integer id) throws IOException {
+	public ResponseEntity<byte[]>  getMessageImageMapByID(@PathVariable Long id) throws IOException {
 		Optional<MessageImageMap> messageImageMapOptional = messageImageMapService.findById(id);
 		String urlString =  messageImageMapOptional.get().getBaseUrl().replace("?id=123", "");
 		log.info("urlString = {}", urlString);
@@ -100,12 +100,12 @@ public class MessageImageMapController {
 	}
 	
 	@DeleteMapping("/messageImageMap/{id}")
-	public void deleteMessageImageMap(@PathVariable Integer id) {
+	public void deleteMessageImageMap(@PathVariable Long id) {
 		messageImageMapService.deleteById(id);
 	}
 	
 	@PutMapping("/messageImageMap/{id}")
-	public @ResponseBody String updateMessageImageMap(@RequestBody MessageImageMap messageImageMap, @PathVariable Integer id) {
+	public @ResponseBody String updateMessageImageMap(@RequestBody MessageImageMap messageImageMap, @PathVariable Long id) {
 		Optional<MessageImageMap> messageImageMapOptional = messageImageMapService.findById(id);
 		if (!messageImageMapOptional.isPresent()) {
 			return "No data [" + id + "]";

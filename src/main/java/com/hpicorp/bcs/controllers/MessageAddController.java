@@ -136,7 +136,7 @@ public class MessageAddController {
 					}
 				}
 				if (am.getMessageType().equals(MessageType.IMAGEMAP.getValue())) {
-					Optional<MessageImageMap> obj = messageImageMapService.findById(am.getMessageId().intValue());
+					Optional<MessageImageMap> obj = messageImageMapService.findById(am.getMessageId());
 					if (obj.isPresent()) {
 						imagemapid = String.valueOf(am.getMessageId());
 						titleText = obj.get().getAltText();
@@ -145,7 +145,7 @@ public class MessageAddController {
 				}
 				if (am.getMessageType().equals(MessageType.TEMPLATE.getValue())) {
 					templateid = String.valueOf(am.getMessageId());
-					Optional<MessageTemplate> obj = messageTemplateService.findById(am.getMessageId().intValue());
+					Optional<MessageTemplate> obj = messageTemplateService.findById(am.getMessageId());
 					if (obj.isPresent()) {
 						titleText = obj.get().getTitle();
 						txtmsg = obj.get().getText();

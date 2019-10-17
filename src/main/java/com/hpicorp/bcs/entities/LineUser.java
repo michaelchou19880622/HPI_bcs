@@ -31,29 +31,11 @@ public class LineUser implements Serializable {
 	@Column(name = "line_uid", nullable = false, length = 33, unique = true)
 	private String lineUid;
 	
-	@Column(name = "gid")
-	private String gid;
-	
-	@Column(name = "private_code")
-	private String privateCode;
-	
-	@Column(name = "s_private_code")
-	private String sPrivateCode;
-	
-	@Column(name = "name")
-	private String name;
-	
-	@Column(name = "image")
-	private String image;
-
 	@Column(name = "status")
 	private Integer status;
 	
 	@Column(name = "linked")
     private String linked;
-
-	@Column(name = "tag")
-	private String tag;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "create_time")

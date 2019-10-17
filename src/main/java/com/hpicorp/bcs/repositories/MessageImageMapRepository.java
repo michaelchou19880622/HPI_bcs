@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hpicorp.bcs.entities.MessageImageMap;
 
 @Repository
-public interface MessageImageMapRepository extends PagingAndSortingRepository<MessageImageMap, Integer> {
+public interface MessageImageMapRepository extends PagingAndSortingRepository<MessageImageMap, Long> {
 
 	@Modifying
 	@Transactional

@@ -31,10 +31,10 @@ public class MessageCarouselColumn implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Column(name = "carousel_id", insertable = false, updatable = false)
-	private Integer carouselId;
+	private Long carouselId;
 
 	@Column(name = "type")
 	private String type;

@@ -29,7 +29,7 @@ public class MessageImageMapAction implements Serializable {
 	private Long id;
 
 	@Column(name = "message_id", insertable = false, updatable = false)
-	private Integer messageId;
+	private Long messageId;
 
 	@Column(name = "type")
 	private String type;

@@ -21,7 +21,7 @@ public class SystemConfig implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Column(name = "config_key", nullable = false)
 	private String configKey;

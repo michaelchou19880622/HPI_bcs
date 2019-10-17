@@ -43,11 +43,11 @@ public class MessageImageMapService {
 		messageImageMapRepository.save(messageImageMap);
 	}
 
-	public Optional<MessageImageMap> findById(Integer id) {
+	public Optional<MessageImageMap> findById(Long id) {
 		return messageImageMapRepository.findById(id);
 	}
 
-	public void deleteById(Integer id) {
+	public void deleteById(Long id) {
 		messageImageMapRepository.deleteById(id);
 	}
 

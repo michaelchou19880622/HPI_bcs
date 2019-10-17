@@ -30,7 +30,7 @@ public class AutoreplyMessageList implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 
 	@Column(name = "autoreply_id", insertable = false, updatable = false)
 	private Long autoreplyId;

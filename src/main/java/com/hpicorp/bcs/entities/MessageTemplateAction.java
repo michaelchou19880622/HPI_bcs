@@ -26,10 +26,10 @@ public class MessageTemplateAction implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Column(name = "template_id", insertable = false, updatable = false)
-	private Integer templateId;
+	private Long templateId;
 
 	@Column(name = "template_type")
 	private String templateType;
