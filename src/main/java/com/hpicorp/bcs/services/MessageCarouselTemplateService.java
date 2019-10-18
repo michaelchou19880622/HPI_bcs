@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.hpicorp.bcs.entities.MessageCarouselAction;
+import com.hpicorp.bcs.entities.MessageCarouselColumn;
 import com.hpicorp.bcs.entities.MessageCarouselTemplate;
 import com.hpicorp.bcs.repositories.MessageCarouselActionRepository;
 import com.hpicorp.bcs.repositories.MessageCarouselColumnRepository;
@@ -48,12 +50,27 @@ public class MessageCarouselTemplateService {
 	public void deleteById(long id) {
 		messageCarouselTemplateRepository.deleteById(id);
 	}
-
-	public void deleteAction(long id) {
-		messageCarouselActionRepository.deleteById(id);
+	
+	public void removeColumns(List<MessageCarouselColumn> messageCarouseColumnList) {
+		for (MessageCarouselColumn messageCarouselColumn : messageCarouseColumnList) {
+			List<MessageCarouselAction> actionList = messageCarouselColumn.getMessageCarouselActionList();
+			this.messageCarouselActionRepository.deleteInBatch(actionList);
+			this.messageCarouselActionRepository.flush();
+		}
+		this.messageCarouselColumnRepository.deleteInBatch(messageCarouseColumnList);
+		this.messageCarouselColumnRepository.flush();
 	}
-
-	public void deleteColumn(long id) {
-		messageCarouselColumnRepository.deleteById(id);
+	
+	// 基本防呆(最多10 column、每個column的action數量要一樣多)
+	public boolean checkCarouselTemplate(MessageCarouselTemplate messageCarouselTemplate) {
+		if(messageCarouselTemplate.getMessageCarouseColumnList().isEmpty() ||
+				messageCarouselTemplate.getMessageCarouseColumnList().size() > 10)
+			return false;
+		int firstColumnActionSize = messageCarouselTemplate.getMessageCarouseColumnList().get(0).getMessageCarouselActionList().size();
+		for (MessageCarouselColumn messageCarouselColumn : messageCarouselTemplate.getMessageCarouseColumnList()) {
+			if(firstColumnActionSize != messageCarouselColumn.getMessageCarouselActionList().size())
+				return false;
+		}
+		return true;
 	}
 }
