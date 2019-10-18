@@ -7,9 +7,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
 import javax.imageio.ImageIO;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,17 +20,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.hpicorp.bcs.entities.MessageImageMap;
 import com.hpicorp.bcs.entities.MessageImageMapAction;
 import com.hpicorp.bcs.services.MessageImageMapService;
-
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -44,22 +37,35 @@ public class MessageImageMapController {
 	@Autowired
 	private MessageImageMapService messageImageMapService;
 	
-	@GetMapping(path = "/messageImageMap")
-	public String index() {
-		return "Index Page";
-	}
 	
+	/**
+	 * [Read List]圖文訊息列表
+	 * @param pageable
+	 * @return
+	 */
 	@GetMapping(path = "/messageImageMap/all")
-	public @ResponseBody Page<MessageImageMap> getAllMessageImageMap(@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable){
+	public Page<MessageImageMap> getAllMessageImageMap(@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable){
 		return messageImageMapService.getAllMessageImageMap(pageable);		
 	}
 	
+	/**
+	 *	取得所有圖文訊息清單
+	 * @param pageable
+	 * @param type
+	 * @return
+	 */
 	@GetMapping(path = "/messageImageMap/all/{type}")
 	public @ResponseBody List<MessageImageMap> getAllMessageImageMap(@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable, @PathVariable String type){
 		return messageImageMapService.getAllMessageImageMapByType(type);
 	}	
 	
-	@RequestMapping(path = "/getImageMap/{id}", method = RequestMethod.GET)
+	/**
+	 *	訊息列表顯示圖文訊息圖片
+	 * @param id
+	 * @return
+	 * @throws IOException
+	 */
+	@GetMapping("/getImageMap/{id}")
 	public ResponseEntity<byte[]>  getMessageImageMapByID(@PathVariable Long id) throws IOException {
 		Optional<MessageImageMap> messageImageMapOptional = messageImageMapService.findById(id);
 		String urlString =  messageImageMapOptional.get().getBaseUrl().replace("?id=123", "");
@@ -87,35 +93,75 @@ public class MessageImageMapController {
 		return ResponseEntity.ok().contentType(mediaType).body(bytes);
 	}
 	
-	@PostMapping(path = "/messageImageMap/new") 
-	public @ResponseBody String createMessageImageMap(@RequestBody MessageImageMap messageImageMap) {
-		for(MessageImageMapAction d : messageImageMap.getMessageImageMapActionList()) {
-			d.setMessageImageMap(messageImageMap);
+	/**
+	 * [Create]建立圖文訊息
+	 * @param messageImageMap
+	 * @return
+	 */
+	@PostMapping("/messageImageMap/new") 
+	public ResponseEntity<String> createMessageImageMap(@RequestBody MessageImageMap messageImageMap) {
+		boolean check = this.messageImageMapService.checkImageMap(messageImageMap);
+		if(check) {
+			try {
+				for(MessageImageMapAction d : messageImageMap.getMessageImageMapActionList()) {
+					d.setMessageImageMap(messageImageMap);
+				}
+				messageImageMap.setModifyTime(new Date());
+				messageImageMapService.insert(messageImageMap);
+				return ResponseEntity.ok().body("新增成功");
+			} catch (Exception e) {
+				log.info("新增圖文訊息失敗： {}", e.getMessage());
+				return ResponseEntity.badRequest().body("新增失敗");
+			}
 		}
-		messageImageMap.setBaseUrl(messageImageMap.getBaseUrl() + "?id=123");
-//		messageImageMap.setBaseUrl(messageImageMap.getBaseUrl());
-		messageImageMap.setModifyTime(new Date());
-		messageImageMapService.insert(messageImageMap);
-		return "Saved";
+		return ResponseEntity.badRequest().body("新增失敗-資料錯誤");
+		
 	}
 	
+	/**
+	 * [Delete]刪除圖文訊息
+	 * @param id
+	 */
 	@DeleteMapping("/messageImageMap/{id}")
 	public void deleteMessageImageMap(@PathVariable Long id) {
 		messageImageMapService.deleteById(id);
 	}
 	
-	@PutMapping("/messageImageMap/{id}")
-	public @ResponseBody String updateMessageImageMap(@RequestBody MessageImageMap messageImageMap, @PathVariable Long id) {
-		Optional<MessageImageMap> messageImageMapOptional = messageImageMapService.findById(id);
-		if (!messageImageMapOptional.isPresent()) {
-			return "No data [" + id + "]";
-		}		
-		messageImageMap.setId(id);
-		for(MessageImageMapAction d : messageImageMap.getMessageImageMapActionList()) {
-			d.setMessageImageMap(messageImageMap);
+	/**
+	 * [Update]編輯圖文訊息
+	 * @param messageImageMap
+	 * @param id
+	 * @return
+	 */
+	@PostMapping("/messageImageMap/update/{id}")
+	public ResponseEntity<String> updateMessageImageMap(@RequestBody MessageImageMap messageImageMap,
+			@PathVariable(value="id") Long id) {
+		Optional<MessageImageMap> originalMessageImageMapOptional = messageImageMapService.findById(id);
+		if (!originalMessageImageMapOptional.isPresent()) {
+			return ResponseEntity.badRequest().body("查無資料");
 		}
-		messageImageMap.setModifyTime(new Date());
-		messageImageMapService.save(messageImageMap);
-		return "Saved";
-	}	
+		boolean check = this.messageImageMapService.checkImageMap(messageImageMap);
+		if(check) {
+			try {
+				// 清除舊的actions
+				List<MessageImageMapAction> originalActionList = originalMessageImageMapOptional.get().getMessageImageMapActionList();
+				originalMessageImageMapOptional.get().setMessageImageMapActionList(null);
+				this.messageImageMapService.save(originalMessageImageMapOptional.get());
+				this.messageImageMapService.removeActions(originalActionList);
+				
+				messageImageMap.setId(id);
+				for(MessageImageMapAction d : messageImageMap.getMessageImageMapActionList()) {
+					d.setMessageImageMap(messageImageMap);
+				}
+				messageImageMap.setModifyTime(new Date());
+				messageImageMapService.save(messageImageMap);
+				
+				return ResponseEntity.ok().body("更新成功");
+			} catch (Exception e) {
+				log.info("更新失敗", e.getMessage());
+				return ResponseEntity.badRequest().body("更新失敗");
+			}
+		}
+		return ResponseEntity.badRequest().body("更新失敗-資料錯誤");
+	}
 }
