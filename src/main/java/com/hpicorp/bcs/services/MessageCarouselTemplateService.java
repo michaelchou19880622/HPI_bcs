@@ -43,7 +43,7 @@ public class MessageCarouselTemplateService {
 		messageCarouselTemplateRepository.save(messageTemplate);
 	}
 
-	public Optional<MessageCarouselTemplate> findById(long id) {
+	public Optional<MessageCarouselTemplate> findById(Long id) {
 		return messageCarouselTemplateRepository.findById(id);
 	}
 

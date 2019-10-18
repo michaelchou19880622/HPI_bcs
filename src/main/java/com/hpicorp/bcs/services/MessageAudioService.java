@@ -1,11 +1,8 @@
 package com.hpicorp.bcs.services;
 
-import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.hpicorp.bcs.entities.MessageAudio;
 import com.hpicorp.bcs.repositories.MessageAudioRepository;
 
@@ -14,10 +11,6 @@ public class MessageAudioService {
 
 	@Autowired
 	private MessageAudioRepository messageAudioRepository ;
-	
-	public List<MessageAudio> getAllMessageAudio() {
-		return messageAudioRepository.findAll();
-	}
 	
 	public Optional<MessageAudio> findById(long id) {
 		return messageAudioRepository.findById(id);

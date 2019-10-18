@@ -13,11 +13,11 @@ public class SendMessageListService {
 	@Autowired
 	private SendMessageListRepository sendMessageListRepository;
 
-	public List<SendMessageList> getSendMessageListBySendID(long id) {
+	public List<SendMessageList> getSendMessageListBySendID(Long id) {
 		return sendMessageListRepository.getSendMessageListBySendID(id);
 	}
 
-	public void deleteById(long id) {
+	public void deleteById(Long id) {
 		sendMessageListRepository.deleteById(id);
 	}
 

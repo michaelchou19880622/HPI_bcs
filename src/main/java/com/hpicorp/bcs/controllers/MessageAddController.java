@@ -72,11 +72,11 @@ public class MessageAddController {
 
 	static final Logger logger = Logger.getLogger(MessageAddController.class);
 
-	@GetMapping(path = "/messageadd/all")
-	public @ResponseBody List<AutoreplyMessageList> getAllAutoreplyMessageList() {
-		return autoreplyMessageListService.getAutoreplyMessageList();
-	}
-
+	/**
+	 * [Read]顯示該關鍵字回覆的訊息內容
+	 * @param autoreplayid
+	 * @return
+	 */
 	@GetMapping(path = "/messageadd/{autoreplyID}")
 	public @ResponseBody Map<String, Map<String, String>> getAllAutoreplyMessageListByID(@PathVariable("autoreplyID") String autoreplayid) {
 		List<AutoreplyMessageList> list = autoreplyMessageListService.getAutoreplyMessageListByAutoreplyID(Long.parseLong(autoreplayid));
