@@ -9,11 +9,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
 import javax.imageio.ImageIO;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,14 +22,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.hpicorp.bcs.entities.MessageCarouselAction;
 import com.hpicorp.bcs.entities.MessageCarouselColumn;
 import com.hpicorp.bcs.entities.MessageCarouselTemplate;
@@ -40,7 +32,6 @@ import com.hpicorp.bcs.entities.MessageTemplate;
 import com.hpicorp.bcs.entities.MessageTemplateAction;
 import com.hpicorp.bcs.services.MessageCarouselTemplateService;
 import com.hpicorp.bcs.services.MessageTemplateService;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -54,7 +45,13 @@ public class MessageTemplateController {
 	@Autowired
 	private MessageCarouselTemplateService messageCarouselTemplateService;
 
-	@RequestMapping(path = "/getMessageTemplate/{id}", method = RequestMethod.GET)
+	/**
+	 *	列表讀取樣板訊息圖片API
+	 * @param id
+	 * @return
+	 * @throws IOException
+	 */
+	@GetMapping("/getMessageTemplate/{id}")
 	public ResponseEntity<byte[]> getMessageImageMapByID(@PathVariable Long id) throws IOException {
 		Optional<MessageTemplate> messageTemplateOptional = messageTemplateService.findById(id);
 
@@ -77,8 +74,13 @@ public class MessageTemplateController {
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(bytes);
 	}
 
+	/**
+	 * [Read]顯示所有樣板訊息清單(預計要改成Page)
+	 * @param page
+	 * @return
+	 */
 	@GetMapping(path = "/messageTemplate/allData")
-	public @ResponseBody List<MessageTemplate> getAllMessageTemplates(@RequestParam(value = "page", defaultValue = "0") Integer page) {
+	public List<MessageTemplate> getAllMessageTemplates(@RequestParam(value = "page", defaultValue = "0") Integer page) {
 		List<MessageTemplate> tmpList = messageTemplateService.getAllMessageTemplateByType();
 		List<MessageCarouselTemplate> ctmplist = messageCarouselTemplateService.getAllMessageCarouselTemplate();
 		for (MessageCarouselTemplate t : ctmplist) {
@@ -115,7 +117,7 @@ public class MessageTemplateController {
 	}
 
 	/**
-	 * 樣板訊息列表
+	 * [Read List]樣板訊息列表
 	 * @param pageable 分頁
 	 * @return
 	 */
@@ -124,10 +126,13 @@ public class MessageTemplateController {
 		return messageTemplateService.getAllMessageTemplateByType(pageable);
 	}
 
-	// 20180703 Arnor, To get message id, change return type from String to
-	// MessageTemplate
+	/**
+	 * [Create]建立樣板訊息
+	 * @param messageTemplate
+	 * @return
+	 */
 	@PostMapping(path = "/messageTemplate/new")
-	public @ResponseBody MessageTemplate createMessageTemplate(@RequestBody MessageTemplate messageTemplate) {
+	public MessageTemplate createMessageTemplate(@RequestBody MessageTemplate messageTemplate) {
 		for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
 			d.setMessageTemplate(messageTemplate);
 		}
@@ -136,71 +141,53 @@ public class MessageTemplateController {
 	}
 	
 	/**
-	 * 樣板訊息編輯
+	 * [Update]編輯樣板訊息
 	 * @param template 樣板訊息
 	 * @return
 	 */
-	@PostMapping(path = "messageTemplate/update")
-	public ResponseEntity<Object> update(@RequestBody MessageTemplate template) {
-		try {
-			template.getMessageTemplateActionList().forEach(i -> i.setMessageTemplate(template));
-			template.setModifyDatetime(new Date());
-			messageTemplateService.insert(template);
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(e);
+	@PostMapping("/messageTemplate/update/{id}")
+	public ResponseEntity<String> updateMessageTemplate(@RequestBody MessageTemplate messageTemplate, 
+			@PathVariable(value="id") Long id) {
+		
+		Optional<MessageTemplate> originalMessageTemplateOptional = messageTemplateService.findById(id);
+		if (!originalMessageTemplateOptional.isPresent()) {
+			return ResponseEntity.badRequest().body("查無資料");
 		}
-		return ResponseEntity.ok().build();
+		boolean check = this.messageTemplateService.checkTemplate(messageTemplate);
+		log.info("更新樣板檢查：" + check);
+		if(check) {
+			try {
+				// 刪掉原本的Actions
+				List<MessageTemplateAction> originalActionList = originalMessageTemplateOptional.get().getMessageTemplateActionList();
+				originalMessageTemplateOptional.get().setMessageTemplateActionList(null);
+				this.messageTemplateService.save(originalMessageTemplateOptional.get());
+				this.messageTemplateService.removeActions(originalActionList);
+				
+				// 建新的Actions
+				messageTemplate.setId(id);
+				for(MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
+					log.debug("updateMessageImageMap getId:" + d.getId());
+					d.setMessageTemplate(messageTemplate);
+				}
+				messageTemplate.setModifyDatetime(new Date());
+				messageTemplateService.save(messageTemplate);
+				return ResponseEntity.ok().body("更新成功");
+			} catch (Exception e) {
+				log.error("更新樣板失敗- Error= {}", e);
+				return ResponseEntity.badRequest().body("更新失敗");
+			}
+		}
+		return ResponseEntity.badRequest().body("更新失敗 - 資料錯誤");
+
 	}
 
+	/**
+	 * [Delete]刪除樣板訊息
+	 * @param id
+	 */
 	@DeleteMapping("/messageTemplate/{id}")
 	public void deleteMessageImageMap(@PathVariable long id) {
 		messageTemplateService.deleteById(id);
-	}
-
-	@PutMapping("/messageTemplate/{id}")
-	public @ResponseBody String updateMessageImageMap(@RequestBody MessageTemplate messageTemplate, @PathVariable Long id) {
-		Optional<MessageTemplate> messageImageMapOptional = messageTemplateService.findById(id);
-		if (!messageImageMapOptional.isPresent()) {
-			return "Nodata [" + id + "]";
-		}
-		messageTemplate.setId(id);
-		for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
-			d.setMessageTemplate(messageTemplate);
-		}
-		messageTemplate.setModifyDatetime(new Date());
-		messageTemplateService.save(messageTemplate);
-		return "Saved";
-	}
-
-	// 20180806 Arnor, build Apply agreement confirm message and apply completed
-	// confirm message
-	@SuppressWarnings("unchecked")
-	public MessageTemplate buildEventConfirmMessage(Map<String, Object> confirmMessageMap) {
-		MessageTemplate messageTemplate = new MessageTemplate();
-		MessageTemplateAction messageTemplateAction;
-
-		messageTemplate.setType(confirmMessageMap.get("type").toString());
-		messageTemplate.setAltText(confirmMessageMap.get("alt_text").toString());
-		messageTemplate.setThumbnailImageUrl(confirmMessageMap.get("thumbnail_image_url").toString());
-		messageTemplate.setImageAspectRatio(confirmMessageMap.get("image_aspect_ratio").toString());
-		messageTemplate.setImageSize(confirmMessageMap.get("image_size").toString());
-		messageTemplate.setImageBackgroundColor(confirmMessageMap.get("image_background_color").toString());
-		messageTemplate.setTitle(confirmMessageMap.get("title").toString());
-		messageTemplate.setText(confirmMessageMap.get("text").toString());
-		List<MessageTemplateAction> messageTemplateActionList = new ArrayList<>();
-		for (Map<String, String> action : (List<Map<String, String>>) confirmMessageMap.get("messageTemplateActionList")) {
-			messageTemplateAction = new MessageTemplateAction();
-			messageTemplateAction.setTemplateType(action.get("template_type"));
-			messageTemplateAction.setType(action.get("type"));
-			messageTemplateAction.setLabel(action.get("label"));
-			messageTemplateAction.setData(action.get("data"));
-			messageTemplateAction.setText(action.get("text"));
-			messageTemplateAction.setUri(action.get("uri"));
-			messageTemplateAction.setMessageTemplate(messageTemplate);
-			messageTemplateActionList.add(messageTemplateAction);
-		}
-		messageTemplate.setMessageTemplateActionList(messageTemplateActionList);
-		return messageTemplate;
 	}
 	
 }

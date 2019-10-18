@@ -2,13 +2,14 @@ package com.hpicorp.bcs.services;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import com.hpicorp.bcs.entities.MessageTemplate;
+import com.hpicorp.bcs.entities.MessageTemplateAction;
+import com.hpicorp.bcs.enums.MessageTemplateTypes;
+import com.hpicorp.bcs.repositories.MessageTemplateActionRepository;
 import com.hpicorp.bcs.repositories.MessageTemplateRepository;
 
 @Service
@@ -16,10 +17,9 @@ public class MessageTemplateService {
 
 	@Autowired
 	private MessageTemplateRepository messageTemplateRepository;
-
-	public Page<MessageTemplate> getAllMessageTemplate(Pageable pageable) {
-		return messageTemplateRepository.findAll(pageable);
-	}
+	
+	@Autowired
+	private MessageTemplateActionRepository messageTemplateActionRepository;
 
 	public List<MessageTemplate> getAllMessageTemplateByType() {
 		return messageTemplateRepository.getMessageTeamplateByType();
@@ -44,8 +44,25 @@ public class MessageTemplateService {
 	public void deleteById(Long id) {
 		messageTemplateRepository.deleteById(id);
 	}
-
-	public void deleteByTemplateID(long id) {
-		messageTemplateRepository.deleteByTemplateID(id);
+	
+	public boolean checkTemplate(MessageTemplate messageTemplate) {
+		if(messageTemplate.getMessageTemplateActionList() == null ||
+				messageTemplate.getMessageTemplateActionList().isEmpty())
+			return false;
+		if(messageTemplate.getType().equals(MessageTemplateTypes.BUTTONS.toString()) &&
+				messageTemplate.getMessageTemplateActionList().size() > 4) {
+			return false;
+		}
+		if(messageTemplate.getType().equals(MessageTemplateTypes.CONFIRM.toString()) &&
+				messageTemplate.getMessageTemplateActionList().size() != 2) {
+			return false;
+		}
+		return true;
 	}
+
+	public void removeActions(List<MessageTemplateAction> messageTemplateActionList) {
+		this.messageTemplateActionRepository.deleteInBatch(messageTemplateActionList);
+		this.messageTemplateActionRepository.flush();
+		
+	}	
 }
