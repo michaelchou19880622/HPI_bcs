@@ -16,7 +16,6 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,16 +68,29 @@ public class LineUserGroupController {
 	@Autowired
 	private AzureCDNService azureCDNService;
 
+	/**
+	 * [Read List]群組列表
+	 * @param pageable
+	 * @return
+	 */
 	@GetMapping("")
 	public Page<LineUserGroup> getAllLineUserGroup(@PageableDefault(value = 10) Pageable pageable) {
 		return lineUserGroupRepository.findAll(pageable);
 	}
-
+	
+	/**
+	 * [Read List]群組下拉選單
+	 * @return
+	 */
 	@GetMapping("/all")
 	public List<LineUserGroup> getAllLineUserGroup() {
 		return lineUserGroupRepository.findAll();
 	}
 
+	/**
+	 * [Read List]群組下拉選單(之後優化會刪掉)
+	 * @return
+	 */
 	@GetMapping("/all/name")
 	public List<Map<String, String>> getAllLineUserGroupName() {
 		List<LineUserGroup> grouplist = lineUserGroupRepository.findAll();
@@ -92,13 +104,12 @@ public class LineUserGroupController {
 		return result;
 	}
 
-	@PostMapping("/new")
-	public LineUserGroup createLineUserGroup(@Valid @RequestBody LineUserGroup lineUserGroup) {
-		lineUserGroup.setModifyTime(new Date());
-		lineUserGroup.setSystemFlag("N");
-		return lineUserGroupRepository.save(lineUserGroup);
-	}
-
+	/**
+	 * [Read] 取得群組
+	 * @param lineUserGroupId
+	 * @return
+	 * @throws Exception
+	 */
 	@GetMapping("/id/{id}")
 	public Map<String, Object> getLineUserGroupById(@PathVariable(value = "id") Long lineUserGroupId) throws Exception {
 		Map<String, Object> returnMap = new HashMap<>();
@@ -115,19 +126,13 @@ public class LineUserGroupController {
 		return returnMap;
 	}
 
-	@PutMapping("/{id}")
-	public LineUserGroup updateLineUserGroup(@PathVariable(value = "id") Long lineUserGroupId, @Valid @RequestBody LineUserGroup lineUserGroupDetails) throws Exception {
-
-		LineUserGroup lineUserGroup = lineUserGroupRepository.findById(lineUserGroupId)
-				.orElseThrow(() -> new Exception("update LineUserGroup error => " + lineUserGroupId));
-
-		lineUserGroup.setName(lineUserGroupDetails.getName());
-		lineUserGroup.setDescription(lineUserGroupDetails.getDescription());
-		lineUserGroup.setModifyAccount(lineUserGroupDetails.getModifyAccount());
-		lineUserGroup.setModifyTime(new Date());
-		return lineUserGroupRepository.save(lineUserGroup);
-	}
 	
+	/**
+	 * [Create]建立群組
+	 * @param createData
+	 * @return
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	@PostMapping("/newgroup")
 	@Transactional(rollbackFor = Exception.class)
@@ -189,6 +194,13 @@ public class LineUserGroupController {
 		return ResponseEntity.ok().build();
 	}
 
+	/**
+	 * [Update]修改群組
+	 * @param groupId
+	 * @param modifyData
+	 * @return
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	@PutMapping("/modifygroup/{id}")
 	@Transactional(rollbackFor = Exception.class)
@@ -248,6 +260,12 @@ public class LineUserGroupController {
 		
 	}
 
+	/**
+	 * [Delete]刪除群組
+	 * @param lineUserGroupId
+	 * @return
+	 * @throws Exception
+	 */
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Object> deleteLineUserGroup(@PathVariable(value = "id") Long lineUserGroupId) throws Exception {
 		LineUserGroup lineUserGroup = lineUserGroupRepository.findById(lineUserGroupId)
@@ -256,16 +274,12 @@ public class LineUserGroupController {
 		return ResponseEntity.ok().build();
 	}
 
-	@SuppressWarnings("unchecked")
-	@GetMapping("/getUsers/{id}")
-	public List<String> getLineUserGroupListById(@PathVariable(value = "id") Long lineUserGroupId) throws Exception {
-		LineUserGroup lineUserGroup = lineUserGroupRepository.findById(lineUserGroupId)
-				.orElseThrow(() -> new Exception("LineUserGroup error => " + lineUserGroupId));
-		String getUserSql = lineUserGroup.getGetusers();
-		Query query = em.createNativeQuery(getUserSql);
-		return query.getResultList();
-	}
-
+	/**
+	 * 	群組上傳檔案，儲存CSV內的UID
+	 * @param fileList
+	 * @return
+	 * @throws Exception
+	 */
 	@PostMapping("/savefiles")
 	@Transactional(rollbackFor = Exception.class)
 	public ResponseEntity<Object> saveUploadCsvFiles(@Valid @RequestBody List<Map<String, Object>> fileList) throws Exception {
@@ -329,6 +343,11 @@ public class LineUserGroupController {
 		return ResponseEntity.ok().build();
 	}
 
+	/**
+	 * 	上傳檔案後點選移除檔案，刪掉資料庫無用的資料
+	 * @param filename
+	 * @return
+	 */
 	@DeleteMapping("/deletefile/{filename}")
 	@Transactional(rollbackFor = Exception.class)
 	public ResponseEntity<Object> deleteUploadedCsvFile(@PathVariable(value = "filename") String filename) {
@@ -345,6 +364,29 @@ public class LineUserGroupController {
 			throw e;
 		}
 		return ResponseEntity.ok().build();
+	}
+	
+	/**
+	 * 	比較上傳名單、LineUser有符合的數量
+	 * @param fileList
+	 * @return
+	 */
+	@PostMapping("/compare")
+	public ResponseEntity<Object> compareLineUser(@Valid @RequestBody List<Map<String, String>> fileList) {
+		List<String> mappedUidList = new ArrayList<>();
+		if (fileList.isEmpty()) {
+			return ResponseEntity.badRequest().body("尚未上傳檔案！");
+		} else {
+			for (Map<String, String> filenameMap : fileList) {
+				String filename = filenameMap.get("response").split("success:")[1];
+				List<UploadUid> uploadUidList = uploadUidService.findByfilename(filename);
+				for (UploadUid uploadUid : uploadUidList) {
+					if (!mappedUidList.contains(uploadUid.getUid()))
+						mappedUidList.add(uploadUid.getUid());
+				}
+			}
+		}
+		return ResponseEntity.ok().body(mappedUidList.size());
 	}
 
 	private String buildGetUsersScript(List<Map<String, Object>> fileData) {
@@ -380,22 +422,21 @@ public class LineUserGroupController {
 		return file.get("response").toString().split("success:")[1];
 	}
 	
-	@PostMapping("/compare")
-	public ResponseEntity<Object> compareLineUser(@Valid @RequestBody List<Map<String, String>> fileList) {
-		List<String> mappedUidList = new ArrayList<>();
-		if (fileList.isEmpty()) {
-			return ResponseEntity.badRequest().body("尚未上傳檔案！");
-		} else {
-			for (Map<String, String> filenameMap : fileList) {
-				String filename = filenameMap.get("response").split("success:")[1];
-				List<UploadUid> uploadUidList = uploadUidService.findByfilename(filename);
-				for (UploadUid uploadUid : uploadUidList) {
-					if (!mappedUidList.contains(uploadUid.getUid()))
-						mappedUidList.add(uploadUid.getUid());
-				}
-			}
-		}
-		return ResponseEntity.ok().body(mappedUidList.size());
+	private LineUserGroup createLineUserGroup(LineUserGroup lineUserGroup) {
+		lineUserGroup.setModifyTime(new Date());
+		lineUserGroup.setSystemFlag("N");
+		return lineUserGroupRepository.save(lineUserGroup);
 	}
 	
+	private LineUserGroup updateLineUserGroup(Long lineUserGroupId, LineUserGroup lineUserGroupDetails) throws Exception {
+
+		LineUserGroup lineUserGroup = lineUserGroupRepository.findById(lineUserGroupId)
+				.orElseThrow(() -> new Exception("update LineUserGroup error => " + lineUserGroupId));
+
+		lineUserGroup.setName(lineUserGroupDetails.getName());
+		lineUserGroup.setDescription(lineUserGroupDetails.getDescription());
+		lineUserGroup.setModifyAccount(lineUserGroupDetails.getModifyAccount());
+		lineUserGroup.setModifyTime(new Date());
+		return lineUserGroupRepository.save(lineUserGroup);
+	}
 }
