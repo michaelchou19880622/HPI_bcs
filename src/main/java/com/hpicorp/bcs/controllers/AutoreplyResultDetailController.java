@@ -2,7 +2,6 @@ package com.hpicorp.bcs.controllers;
 
 import java.util.Date;
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,11 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.hpicorp.bcs.common.DateTimeModel;
 import com.hpicorp.bcs.entities.dto.CustomAutoreplyDetail;
 import com.hpicorp.bcs.services.AutoreplyResultModelService;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -31,7 +28,7 @@ public class AutoreplyResultDetailController {
 	private AutoreplyResultModelService autoreplyResultModelService;
 
 	/**
-	 * 供 依照關鍵字編號取得日期範圍內的使用統計(count)資料 包含 使用人數 和 人次 API
+	 * 	供 依照關鍵字編號取得日期範圍內的使用統計(count)資料 包含 使用人數 和 人次 API
 	 * @param mappingId 關鍵字編號
 	 * @param since 開始日期
 	 * @param untils 結束日期
@@ -58,7 +55,7 @@ public class AutoreplyResultDetailController {
 	}
 
 	/**
-	 * 供 提供關鍵字編號及時間區間查找使用過的User UUID API
+	 * 	供 提供關鍵字編號及時間區間查找使用過的User UUID API
 	 * @param mappingId 關鍵字編號
 	 * @param since 開始日期
 	 * @param untils 結束日期
@@ -85,7 +82,7 @@ public class AutoreplyResultDetailController {
 	}
 	
 	/**
-	 * 供 提供關鍵字編號及時間區間 匯出 觸發成效
+	 * 	供 提供關鍵字編號及時間區間 匯出 觸發成效
 	 * @param mappingId 關鍵字編號
 	 * @param since 開始日期
 	 * @param untils 結束日期
