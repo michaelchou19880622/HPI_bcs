@@ -16,16 +16,6 @@ public class UserResultLogModelService {
 	@Autowired
 	private UserTrackService userTrackDao;
 	
-	public Map<String, Integer> getUserResultLogCountListBetweenDate(Date from, Date to) throws Exception {
-		Map<String, Integer> result = new HashMap<String, Integer>();
-		 for (LineUserTrackSource b : LineUserTrackSource.values()) {
-			 String key = b.toString();
-			 Integer count = this.userTrackDao.getCountBySourceAndDate(b, from, to);
-			 result.put(key, count);
-		 }
-		return result;
-	}
-	
 	public Map<String, Object> getLogBetweenDate(Date from, Date to, String source) throws Exception {
 		Map<String, Object> content = new HashMap<String, Object>();
 		List<LineUserTrackSource> sources = LineUserTrackSource.getListByString(source);
