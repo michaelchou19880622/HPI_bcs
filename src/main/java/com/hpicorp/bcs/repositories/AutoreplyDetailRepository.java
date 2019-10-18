@@ -26,6 +26,6 @@ public interface AutoreplyDetailRepository extends JpaRepository<AutoreplyDetail
 	@Modifying
     @Transactional
     @Query(value = "delete from AutoreplyDetail A where A.autoreplyId = :autoreply_id ")
-	public void deleteByAutoreplyID(@Param("autoreply_id") long autoreplyIid);
+	public void deleteByAutoreplyID(@Param("autoreply_id") Long autoreplyIid);
 	
 }

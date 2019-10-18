@@ -18,7 +18,7 @@ public class AutoreplyMessageListService {
 		return autoreplyMessageListRepository.findAll();
 	}
 	
-	public List<AutoreplyMessageList> getAutoreplyMessageListByAutoreplyID(long id) {
+	public List<AutoreplyMessageList> getAutoreplyMessageListByAutoreplyID(Long id) {
 		return autoreplyMessageListRepository.getAutoreplyMessageListByAutoreplyID(id);
 	}
 	
@@ -30,7 +30,7 @@ public class AutoreplyMessageListService {
 		autoreplyMessageListRepository.deleteById(id);
 	}
 	
-	public void deleteByAutoreplyId(long id) {
+	public void deleteByAutoreplyId(Long id) {
 		autoreplyMessageListRepository.deleteByAutoreplyID(id);
 	}	
 	

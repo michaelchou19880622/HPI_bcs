@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hpicorp.bcs.entities.Autoreply;
@@ -49,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AutoreplyController {
 
 	private static final String STATUS = "status";
+	private static final String SUCCESS = "Success";
 
 	@Autowired
 	private AutoreplyService autoreplyService;
@@ -74,14 +74,25 @@ public class AutoreplyController {
 	@Autowired
 	private MessageTemplateService messageTemplateService;
 
+	/**
+	 * [Read List]關鍵字列表
+	 * @param pageable
+	 * @return
+	 */
 	@GetMapping(value = "/autoreply/all")
-	public @ResponseBody Page<Autoreply> getAllAutoreply(
+	public Page<Autoreply> getAllAutoreply(
 			@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable) {
 		return autoreplyService.getAutoreplyListWithoutDefault(pageable);
 	}
 
+	/**
+	 * [Read List]依照不同條件撈出關鍵字列表
+	 * @param pageable
+	 * @param key
+	 * @return
+	 */
 	@GetMapping(path = "/autoreply/period/{key}")
-	public @ResponseBody Page<Autoreply> getAllSeAutoreplyByPeriod(
+	public Page<Autoreply> getAllSeAutoreplyByPeriod(
 			@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable,
 			@PathVariable("key") String key) {
 		Date date = new Date();
@@ -94,14 +105,23 @@ public class AutoreplyController {
 		}
 	}
 
+	/**
+	 * [Delete]刪除關鍵字
+	 * @param id
+	 */
 	@DeleteMapping("/autoreply/{id}")
-	public void deleteAutoreply(@PathVariable long id) {
+	public void deleteAutoreply(@PathVariable Long id) {
 		autoreplyMessageListService.deleteByAutoreplyId(id);
 		autoreplyService.deleteById(id);
 	}
 
+	/**
+	 * [Create]新增關鍵字
+	 * @param autoreply
+	 * @return
+	 */
 	@PostMapping(path = "/autoreply/new")
-	public @ResponseBody Map<String, String> createAutoreply(@RequestBody Autoreply autoreply) {
+	public Map<String, String> createAutoreply(@RequestBody Autoreply autoreply) {
 
 		for (AutoreplyDetail d : autoreply.getAutoreplyDetails()) {
 			d.setAutoreply(autoreply);
@@ -137,7 +157,7 @@ public class AutoreplyController {
 						d.setMessageTemplate(messageTemplate);
 					}
 					messageTemplateService.insert(messageTemplate);
-					am.setMessageId(messageTemplate.getId().longValue());
+					am.setMessageId(messageTemplate.getId());
 					typelist[0] = MessageType.TEMPLATE.getValue();
 				}
 				am.setOrderNum(Integer.parseInt(typelist[1], 10));
@@ -152,7 +172,7 @@ public class AutoreplyController {
 			autoreplyService.insert(autoreply);
 
 			Map<String, String> mapped = new HashMap<>();
-			mapped.put(STATUS, "Success");
+			mapped.put(STATUS, SUCCESS);
 			mapped.put("id", autoreply.getId().toString());
 			return mapped;
 		} catch (Exception e) {
@@ -162,8 +182,14 @@ public class AutoreplyController {
 		
 	}
 
+	/**
+	 * [Update]更新關鍵字
+	 * @param autoreply
+	 * @param id
+	 * @return
+	 */
 	@PutMapping("/autoreply/{id}")
-	public @ResponseBody Map<String, String> updateAutoreply(@RequestBody Autoreply autoreply, @PathVariable long id) {
+	public Map<String, String> updateAutoreply(@RequestBody Autoreply autoreply, @PathVariable Long id) {
 		Optional<Autoreply> autoreplyMapOptional = autoreplyService.findById(id);
 		Map<String, String> mapped = new HashMap<>();
 		if (!autoreplyMapOptional.isPresent()) {
@@ -197,13 +223,20 @@ public class AutoreplyController {
 		autoreply.setModificationTime(new Date());
 		autoreplyService.save(autoreply);
 
-		mapped.put(STATUS, "Success");
+		mapped.put(STATUS, SUCCESS);
 		mapped.put("id", autoreply.getId().toString());
 		return mapped;
 	}
 
+	/**
+	 * [Update]更新關鍵字狀態
+	 * @param id
+	 * @param status
+	 * @return
+	 */
 	@PutMapping("/autoreply/status/{id}/{status}")
-	public @ResponseBody Map<String, String> updateAutoreplyStatus(@PathVariable long id, @PathVariable String status) {
+	public Map<String, String> updateAutoreplyStatus(@PathVariable Long id, 
+			@PathVariable String status) {
 
 		Optional<Autoreply> autoreplyMapOptional = autoreplyService.findById(id);
 		Map<String, String> mapped = new HashMap<>();
@@ -215,12 +248,18 @@ public class AutoreplyController {
 		autoreplyMapOptional.get().setModificationTime(new Date());
 		autoreplyService.save(autoreplyMapOptional.get());
 
-		mapped.put(STATUS, "Success");
+		mapped.put(STATUS, SUCCESS);
 		mapped.put("id", autoreplyMapOptional.get().getId().toString());
 		return mapped;
 	}
 
-	private void deleteUnused(long id, Autoreply autoreply, List<AutoreplyMessageList> list) {
+	/**
+	 * 	配合更新關鍵字，刪掉舊有的資料(之後要改放到AutoreplyService)
+	 * @param id
+	 * @param autoreply
+	 * @param list
+	 */
+	private void deleteUnused(Long id, Autoreply autoreply, List<AutoreplyMessageList> list) {
 
 		for (AutoreplyMessageList am1 : list) {
 			boolean isExist = false;
@@ -235,6 +274,11 @@ public class AutoreplyController {
 		autoreplyService.deleteAutoreplyDetailByAutoreplyID(id);
 	}
 
+	/**
+	 * 	設定關鍵字回覆訊息(之後要改放到AutoreplyService)
+	 * @param msgtype
+	 * @param am
+	 */
 	private void processByMessageType(String msgtype, AutoreplyMessageList am) {
 		if (msgtype.equals(MessageType.TEXT.getValue())) {
 			MessageText txt = am.getMessageTextList().get(0);
@@ -262,7 +306,7 @@ public class AutoreplyController {
 				d.setMessageTemplate(messageTemplate);
 			}
 			messageTemplateService.insert(messageTemplate);
-			am.setMessageId(messageTemplate.getId().longValue());
+			am.setMessageId(messageTemplate.getId());
 			msgtype = MessageType.TEMPLATE.getValue();
 		}
 

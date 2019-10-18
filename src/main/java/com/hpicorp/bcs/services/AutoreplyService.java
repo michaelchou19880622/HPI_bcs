@@ -1,9 +1,7 @@
 package com.hpicorp.bcs.services;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,21 +19,8 @@ public class AutoreplyService {
 	@Autowired
 	private AutoreplyDetailRepository autoreplyDetailRepository;	
 	
-	public String getKeywordById(Long id) throws Exception {
-		Optional<Autoreply> optional = this.findById(id);
-		if (optional.isPresent()) {
-			Autoreply entity = optional.get();
-			return entity.getKeyword();
-		}
-		return null;
-	}
-	
 	public Page<Autoreply> getAutoreplyListWithoutDefault(Pageable pageable) {
 		return autoreplyRepository.getAutoreplyListWithoutDefault(pageable);
-	}
-	
-	public List<Autoreply> getAllAutoreply() {
-		return (List<Autoreply>) autoreplyRepository.findAll();
 	}
 	
 	public void insert(Autoreply autoreply) {
@@ -46,15 +31,15 @@ public class AutoreplyService {
 		autoreplyRepository.save(autoreply);		
 	}
 	
-	public Optional<Autoreply> findById(long id) {
+	public Optional<Autoreply> findById(Long id) {
 		return autoreplyRepository.findById(id);
 	}
 	
-	public void deleteById(long id) {
+	public void deleteById(Long id) {
 		autoreplyRepository.deleteById(id);
 	}	
 	
-	public void deleteAutoreplyDetailByAutoreplyID(long id) {
+	public void deleteAutoreplyDetailByAutoreplyID(Long id) {
 		autoreplyDetailRepository.deleteByAutoreplyID(id);
 	}
 	

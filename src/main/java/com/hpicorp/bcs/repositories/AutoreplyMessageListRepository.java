@@ -17,7 +17,7 @@ import com.hpicorp.bcs.entities.AutoreplyMessageList;
 public interface AutoreplyMessageListRepository extends JpaRepository<AutoreplyMessageList, Long> {
 
     @Query(value = "select A from AutoreplyMessageList A where autoreplyId = :autoreply_id order by orderNum ")
-	public List<AutoreplyMessageList> getAutoreplyMessageListByAutoreplyID(@Param("autoreply_id") long autoreplyIid);
+	public List<AutoreplyMessageList> getAutoreplyMessageListByAutoreplyID(@Param("autoreply_id") Long autoreplyIid);
 	
 	@Query(value = "select distinct L from AutoreplyMessageList L "
 				 + "inner join Autoreply a on a.id = L.autoreplyId "
@@ -40,6 +40,6 @@ public interface AutoreplyMessageListRepository extends JpaRepository<AutoreplyM
 	@Modifying
     @Transactional
     @Query(value = "delete from AutoreplyMessageList A where A.autoreplyId = :autoreply_id ")
-	public void deleteByAutoreplyID(@Param("autoreply_id") long autoreplyIid);
+	public void deleteByAutoreplyID(@Param("autoreply_id") Long autoreplyIid);
 	
 }
