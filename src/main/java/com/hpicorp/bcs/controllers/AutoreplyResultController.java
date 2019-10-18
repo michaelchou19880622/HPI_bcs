@@ -7,11 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.hpicorp.bcs.common.DateTimeModel;
 import com.hpicorp.bcs.entities.dto.AutoreplyResultBody;
 import com.hpicorp.bcs.services.AutoreplyResultModelService;
@@ -27,7 +26,14 @@ public class AutoreplyResultController {
 	@Autowired
 	private AutoreplyResultModelService model;
 
-	@RequestMapping(path = "/keyword", method = RequestMethod.GET)
+	/**
+	 *	關鍵字點擊報表
+	 * @param keyword
+	 * @param page
+	 * @param period
+	 * @return
+	 */
+	@GetMapping("/keyword")
 	public ResponseEntity<Object> getByAutoreplyResultBody(
 			@RequestParam(value = "keyword", required = false) String keyword,
 			@RequestParam(value = "page", required = false) Integer page,

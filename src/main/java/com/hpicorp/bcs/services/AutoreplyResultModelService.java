@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import com.hpicorp.bcs.common.CsvGenerator;
 import com.hpicorp.bcs.entities.dto.AutoreplyResultBody;
 import com.hpicorp.bcs.entities.dto.CustomAutoreplyDetail;
@@ -25,9 +23,6 @@ import com.hpicorp.bcs.enums.UserClickType;
 @Service
 @Component
 public class AutoreplyResultModelService {
-	
-	@Autowired
-	private UserClickService userClickDao;
 	
 	@Autowired
 	private UserClickService userClickService;
@@ -43,9 +38,9 @@ public class AutoreplyResultModelService {
  		Date period = body.getPeriod();
 		Pageable pageable = PageRequest.of(page, DefaultConfig.PAGESIZE.getValue());
  		if (keyword == null) {
- 			pageContent = this.userClickDao.getByPeriod(period, pageable);
+ 			pageContent = this.userClickService.getByPeriod(period, pageable);
  		} else {
- 			pageContent = this.userClickDao.getByKeywordAndPeriod(keyword, period, pageable);
+ 			pageContent = this.userClickService.getByKeywordAndPeriod(keyword, period, pageable);
  		}
  		if (pageContent != null) {
  			return this.getReturnContent(pageContent);
@@ -81,12 +76,6 @@ public class AutoreplyResultModelService {
 		return result;
 	}
 	
-	public List<String> getUidByMappingIdAndBetweenDate(Long mappingId, Date since, Date untils) throws Exception {
-		String type = UserClickType.AUTOREPLY.toString();
-		List<String> result = this.userClickDao.getUidByTypeAndMappingBetweenDate(type, mappingId, since, untils);
-		return result;
-	}
-
 	public Page<CustomAutoreplyDetail> getAutoreplyDetailDateCountByPage(Long mappingId, Date since, Date untils,
 			Pageable pageable) {
 		Page<Object[]> results = this.userClickService.getAutoreplyByPage(mappingId, UserClickType.AUTOREPLY.toString(), since, untils, pageable);

@@ -3,13 +3,11 @@ package com.hpicorp.bcs.repositories;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
-
 import com.hpicorp.bcs.entities.UserClick;
 
 public interface UserClickRepository extends CrudRepository<UserClick, Long> {
@@ -41,39 +39,6 @@ public interface UserClickRepository extends CrudRepository<UserClick, Long> {
 				 + "where (A.period = 'FOREVER' or (A.period ='DAY' and A.datetimeBegin >= :period)) "
 				 + "group by A.id, A.keyword, A.userStatus, A.period, A.creationTime, A.modifyUser")
 	public Page<Map<String, Object>> getByPeriod(@Param("period") Date period, @Param("type") String type, Pageable pageable);
-
-	@Query(value = "select U.id from UserClick U "
-				 + "	where U.mappingId = :id "
-				 + "and U.type = :type "
-				 + "and U.createTime between :since and :untils "
-				 + "group by date_format(U.createTime, '%Y/%m/%d'), U.id")
-	public List<Long> getRowCountByMappingIdAndTypeAndBetweenDate(@Param("id") Long mappingId, @Param("type") String type, @Param("since") Date since, @Param("untils") Date untils);
-
-	@Query(value = "select "
-				 + "		date_format(c.create_time, '%Y/%m/%d') as date, "
-				 + "		count(c.lineuser_uid) as count "
-				 + "from user_click c "
-				 + "where c.mapping_id = :id "
-				 + "and c.type = :type "
-				 + "and c.create_time between :since and :untils "
-				 + "group by date "
-				 + "order by date asc limit :page, :pageSize", nativeQuery = true)
-	public List<Map<String, String>> getDateAndCountByMappingIdAndType(
-			@Param("id") Long mappingId, @Param("type") String type, @Param("since") Date since, 
-			@Param("untils") Date untils, @Param("page") Integer page, @Param("pageSize") Integer pageSize);
-
-	@Query(value = "select "
-				 + "		date_format(c.create_time, '%Y/%m/%d') as date, "
-				 + "		count(distinct c.lineuser_uid) as count "
-				 + "from user_click c "
-				 + "where c.mapping_id = :id "
-				 + "and c.type = :type "
-				 + "and c.create_time between :since and :untils "
-				 + "group by date "
-				 + "order by date asc limit :page, :pageSize", nativeQuery = true)
-	public List<Map<String, String>> getDistinctCountAndDateByMappingIdAndType(
-			@Param("id") Long mappingId, @Param("type") String type, @Param("since") Date since, 
-			@Param("untils") Date untils, @Param("page") Integer page, @Param("pageSize") Integer pageSize);
 
 	@Query(value = "select distinct U.lineUserUid from UserClick U "
 				 + "where U.type = :type "
