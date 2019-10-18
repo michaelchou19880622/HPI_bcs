@@ -1,21 +1,16 @@
 package com.hpicorp.bcs.repositories;
 
 import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import com.hpicorp.bcs.entities.LinkAddressTrack;
 
 @Repository
 public interface LinkAddressTrackRepository extends JpaRepository<LinkAddressTrack, Long> {
-
-	@Query(value = "select linked from lineuser_link where user_id= :userid ", nativeQuery = true)
-	public String getLinkedByUserID(@Param("userid") long userid);
 
 	// 2019.10.6 已確認該 SQL 會被使用
 	@Query(value = "select " 

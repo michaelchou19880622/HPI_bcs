@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,11 +24,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
-
 import com.hpicorp.bcs.entities.LineUser;
 import com.hpicorp.bcs.entities.LinkAddress;
 import com.hpicorp.bcs.entities.LinkAddressList;
@@ -40,7 +36,6 @@ import com.hpicorp.bcs.entities.dto.CustomLinkAddressTrackDetail;
 import com.hpicorp.bcs.services.LineUserService;
 import com.hpicorp.bcs.services.LinkAddressService;
 import com.hpicorp.bcs.services.LinkAddressTrackService;
-
 import lombok.extern.slf4j.Slf4j;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -59,22 +54,42 @@ public class LinkAddressController {
 
 	private static final String STATUS = "status";
 
+	/**
+	 * [Read List]追蹤連結列表
+	 * @param pageable
+	 * @return
+	 */
 	@GetMapping(value = "/linkaddress/all")
-	public @ResponseBody Page<LinkAddress> getAllLinkAddress(
+	public Page<LinkAddress> getAllLinkAddress(
 			@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable) {
 		return linkAddressService.getAllLinkAddress(pageable);
 	}
 
+	/**
+	 * [Read]追蹤連結所有清單
+	 * @return
+	 */
 	@GetMapping(value = "/linkaddress/allData")
 	public @ResponseBody List<LinkAddress> getAllLinkAddressList() {
 		return linkAddressService.getAllLinkAddress();
 	}
 
+	/**
+	 * [Delete]刪除追蹤連結
+	 * @param id
+	 */
 	@DeleteMapping("/linkaddress/{id}")
 	public void deleteLinkAddress(@PathVariable long id) {
 		linkAddressService.deleteById(id);
 	}
 
+	/**
+	 *	點開追蹤連結，LineLogin後將UID、追蹤連結id帶回查詢最終導向網址(新API)
+	 * @param uid
+	 * @param id
+	 * @param isMobile
+	 * @return
+	 */
 	@GetMapping(value = "/linkaddress/link/{uid}/{id}/{isMobile}")
 	public ResponseEntity<String> getLinkAddress(@PathVariable String uid, @PathVariable Long id,
 			@PathVariable Boolean isMobile) {
@@ -124,8 +139,12 @@ public class LinkAddressController {
 
 	}
 
-	/*
-	 * The Method for LIFF calling userid: 33 codes of LINE UID id : LinkAddress ID
+	/**
+	 *	點開追蹤連結，LineLogin後將UID、追蹤連結id帶回查詢最終導向網址(舊API，為了merge先留著，之後要刪掉)
+	 * @param uid
+	 * @param id
+	 * @param isMobile
+	 * @return
 	 */
 	@GetMapping(value = "/linkaddress/link/{userid}/{id}")
 	public RedirectView getLinkAddressOld(Device device, @PathVariable String userid, @PathVariable long id) {
@@ -173,14 +192,12 @@ public class LinkAddressController {
 		return device.isMobile();
 	}
 	
-	@RequestMapping("/linkaddress/{id}")
-	public RedirectView redirectToLIFF(@PathVariable long id) {
-		String projectUrl = "line://app/1562106995-1rNpOLKq?linkaddress=" + id;
-		RedirectView redirectView = new RedirectView();
-		redirectView.setUrl(projectUrl);
-		return redirectView;
-	}
 
+	/**
+	 * [Create]建立追蹤連結
+	 * @param linkAddress
+	 * @return
+	 */
 	@PostMapping(path = "/linkaddress/new")
 	public @ResponseBody Map<String, String> createLinkAddress(@RequestBody LinkAddress linkAddress) {
 
@@ -195,6 +212,12 @@ public class LinkAddressController {
 		return mapped;
 	}
 
+	/**
+	 * [Update]編輯追蹤連結
+	 * @param linkAddress
+	 * @param id
+	 * @return
+	 */
 	@PutMapping("/linkaddress/{id}")
 	public @ResponseBody Map<String, String> updateLinkAddress(@RequestBody LinkAddress linkAddress,
 			@PathVariable long id) {
@@ -221,17 +244,17 @@ public class LinkAddressController {
 	}
 
 	/**
-	 * 追蹤連結成效列表 API
+	 * 	追蹤連結成效列表 API
 	 * @param pageable 分頁
 	 * @return
 	 */
 	@GetMapping(value = "/linkaddress/reportpage")
-	public @ResponseBody Page<CustomLinkAddressTrack> getLinkAddressTrack1(@PageableDefault(size = 10) Pageable pageable) {
+	public Page<CustomLinkAddressTrack> getLinkAddressTrack1(@PageableDefault(size = 10) Pageable pageable) {
 		return linkAddressTrackService.getLinkAddressTrackBypage(pageable);
 	}
 
 	/**
-	 * 追蹤連結成效單筆依據日期 API
+	 * 	追蹤連結成效單筆依據日期 API
 	 * @param id 該筆數據 ID
 	 * @param pageable 分頁
 	 * @return
@@ -243,7 +266,7 @@ public class LinkAddressController {
 	}
 	
 	/**
-	 * 追蹤連結成效用名稱搜尋 API
+	 * 	追蹤連結成效用名稱搜尋 API
 	 * @param name 搜尋名稱
 	 * @param pageable 分頁
 	 * @return
@@ -263,7 +286,7 @@ public class LinkAddressController {
 	}
 	
 	/**
-	 * 匯出該筆追蹤連結的所有點擊uid
+	 * 	匯出該筆追蹤連結的所有點擊uid
 	 * @param id
 	 * @param response
 	 * @return
@@ -276,7 +299,7 @@ public class LinkAddressController {
 	}
 	
 	/**
-	 * 匯出該筆追蹤連結所有點擊成效(不分頁)
+	 * 	匯出該筆追蹤連結所有點擊成效(不分頁)
 	 * @param id
 	 * @param response
 	 * @return

@@ -3,17 +3,13 @@ package com.hpicorp.bcs.services;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import com.hpicorp.bcs.common.CsvGenerator;
 import com.hpicorp.bcs.entities.LinkAddressTrack;
 import com.hpicorp.bcs.entities.dto.CustomLinkAddressTrack;
@@ -26,32 +22,8 @@ public class LinkAddressTrackService {
 	@Autowired
 	private LinkAddressTrackRepository linkAddressTrackRepository;
 
-	public Page<LinkAddressTrack> getLinkAddressTrack(Pageable pageable) {
-		return linkAddressTrackRepository.findAll(pageable);
-	}
-
-	public List<LinkAddressTrack> getLinkAddressTrack() {
-		return (List<LinkAddressTrack>) linkAddressTrackRepository.findAll();
-	}
-
 	public void insert(LinkAddressTrack linkAddressTrack) {
 		linkAddressTrackRepository.save(linkAddressTrack);
-	}
-
-	public void save(LinkAddressTrack linkAddressTrack) {
-		linkAddressTrackRepository.save(linkAddressTrack);
-	}
-
-	public Optional<LinkAddressTrack> findById(long id) {
-		return linkAddressTrackRepository.findById(id);
-	}
-
-	public void deleteById(long id) {
-		linkAddressTrackRepository.deleteById(id);
-	}
-
-	public String getLinkedByUserID(long userid) {
-		return linkAddressTrackRepository.getLinkedByUserID(userid);
 	}
 
 	public List<Object[]> getLinkAddressTrackByName(String name) {

@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.hpicorp.bcs.entities.LinkAddress;
-import com.hpicorp.bcs.repositories.LinkAddressListRepository;
 import com.hpicorp.bcs.repositories.LinkAddressRepository;
 
 @Service
@@ -16,10 +15,6 @@ public class LinkAddressService {
 
 	@Autowired
 	private LinkAddressRepository linkAddressRepository;
-	
-	@Autowired
-	private LinkAddressListRepository linkAddressListRepository;	
-	
 	
 	public Page<LinkAddress> getAllLinkAddress(Pageable pageable) {
 		return linkAddressRepository.findAll(pageable);
@@ -37,16 +32,13 @@ public class LinkAddressService {
 		linkAddressRepository.save(linkAddress);		
 	}
 	
-	public Optional<LinkAddress> findById(long id) {
+	public Optional<LinkAddress> findById(Long id) {
 		return linkAddressRepository.findById(id);
 	}
 	
-	public void deleteById(long id) {
+	public void deleteById(Long id) {
 		linkAddressRepository.deleteById(id);
 	}	
 	
-	public void deleteListByLinkID(long id) {
-		linkAddressListRepository.deleteByLinkId(id);
-	}
 	
 }
