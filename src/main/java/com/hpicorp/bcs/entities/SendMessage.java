@@ -78,9 +78,6 @@ public class SendMessage implements Serializable {
 	@Column(name = "modify_account")
 	private String modifyAccount;
 
-	@Column(name = "type")
-	private String type;
-	
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "sendMessage", orphanRemoval = true)
 	private List<SendMessageList> sendMessageList = new ArrayList<>();
 

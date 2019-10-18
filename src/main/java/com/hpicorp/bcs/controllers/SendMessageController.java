@@ -104,21 +104,27 @@ public class SendMessageController {
 	@PersistenceContext
 	private EntityManager em;
 
+	/**
+	 * [Read List]訊息列表
+	 * @param pageable
+	 * @return
+	 */
 	@GetMapping(path = "/sendMessage/all")
-	public @ResponseBody Page<SendMessage> getAll(
+	public Page<SendMessage> getAll(
 			@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable) {
 		return sendMessageService.getAllSendMessage(pageable);
 	}
 	
-	@GetMapping(path = "/sendMessage/all/{type}")
-	public @ResponseBody Page<SendMessage> getAllSendMessage(
-			@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable, @PathVariable("type") String type) {
-		return sendMessageService.getAllSendMessage(pageable, type);
-	}
-
+	/**
+	 * [Read List]訊息列表(分發送時間狀態)
+	 * @param pageable
+	 * @param key
+	 * @return
+	 */
 	@GetMapping(path = "/sendMessage/mode/{key}")
-	public @ResponseBody Page<SendMessage> getAllSendMessageByMode(
-			@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable, @PathVariable("key") String key) {
+	public Page<SendMessage> getAllSendMessageByMode(
+			@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable,
+			@PathVariable("key") String key) {
 		List<String> selectedValues = new ArrayList<>();
 		if (key.equals("reserve")) {
 			selectedValues.add("ONCE");
@@ -130,8 +136,14 @@ public class SendMessageController {
 		return sendMessageService.getAllSendMessageByMode(pageable, selectedValues);
 	}
 
+	/**
+	 * [Read List]訊息列表(分發送狀態)
+	 * @param pageable
+	 * @param key
+	 * @return
+	 */
 	@GetMapping(path = "/sendMessage/status/{key}")
-	public @ResponseBody Page<SendMessage> getAllSendMessageByStatus(
+	public Page<SendMessage> getAllSendMessageByStatus(
 			@PageableDefault(value = 10, sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable, @PathVariable("key") String key) {
 		int istatus = 0;
 		if (key.equals("draft")) {
@@ -142,8 +154,13 @@ public class SendMessageController {
 		return sendMessageService.getAllSendMessageByStatus(pageable, istatus);
 	}
 
+	/**
+	 * [Create]新增發送訊息
+	 * @param sendMessage
+	 * @return
+	 */
 	@PostMapping(path = "/sendMessage/new")
-	public @ResponseBody Map<String, String> createSendMessage(@RequestBody SendMessage sendMessage) {
+	public Map<String, String> createSendMessage(@RequestBody SendMessage sendMessage) {
 		log.info(sendMessage.getSendMessageList().toString());
 
 		for (SendMessageList am : sendMessage.getSendMessageList()) {
@@ -187,9 +204,9 @@ public class SendMessageController {
 		sendMessage.setModifyTime(new Date());
 		sendMessageService.insert(sendMessage);
 		long newId = sendMessage.getId();
-		int groupID = Integer.parseInt(sendMessage.getGroupId().toString());
+		Long groupID = sendMessage.getGroupId();
 		StringBuilder sb = new StringBuilder();
-		if (groupID == -101) { // Send to me
+		if (groupID.compareTo(-101L) == 0) { // Send to me
 			String account = sendMessage.getModifyAccount();
 			Optional<SystemUser> sUser = systemUserRepository.findByAccount(account);
 			if (sUser.isPresent()) {
@@ -201,15 +218,15 @@ public class SendMessageController {
 					sendMessageService.insSendMessageUser(sb.toString());
 				}
 			}
-		} else if (groupID == -9) { // All
+		} else if (groupID.compareTo(-9L) == 0) { // All
 			sb.append("insert into send_message_users (send_id, line_user_id) ");
 			sb.append("select " + newId + ", id from lineuser where length(line_uid) = 33 ;");
 			log.info("SQL => " + sb.toString());
 			sendMessageService.insSendMessageUser(sb.toString());
-		} else if (groupID == -99) { // Send to Test Group
+		} else if (groupID.compareTo(-99L) == 0) { // Send to Test Group
 			sb.append("select id from lineuser where line_uid in (select lineuser_uid from systemuser where length(lineuser_uid) = 33)");
 			log.info("SQL:=> " + sb.toString());
-		} else if (groupID > 0) {
+		} else if (groupID.compareTo(0L) > 0) {
 			List<BigInteger> lineUserList = sendMessageService.getLineUserGroupListById(groupID);
 			sb.append("insert into send_message_users (send_id, line_user_id) values ");
 			int idx = 0;
@@ -229,12 +246,22 @@ public class SendMessageController {
 		return mapped;
 	}
 
+	/**
+	 * [Delete]刪除訊息
+	 * @param id
+	 */
 	@DeleteMapping("/sendMessage/{id}")
 	public void deleteSendMessage(@PathVariable long id) {
 		log.info("deleteMessageImageMap:" + id);
 		sendMessageService.deleteById(id);
 	}
 
+	/**
+	 * [Update]更新訊息內容
+	 * @param sendMessage
+	 * @param id
+	 * @return
+	 */
 	@PutMapping(path = "/sendMessage/{id}")
 	public @ResponseBody Map<String, String> updateMessage(@RequestBody SendMessage sendMessage,
 			@PathVariable long id) {
@@ -306,8 +333,13 @@ public class SendMessageController {
 		return mapped;
 	}
 
+	/**
+	 * [Read]取得該發送訊息的訊息清單
+	 * @param sendMessageID
+	 * @return
+	 */
 	@GetMapping(path = "/sendMessage/getList/{sendMessageID}")
-	public @ResponseBody Map<String, Map<String, String>> getAllAutoreplyMessageListByID(
+	public Map<String, Map<String, String>> getAllAutoreplyMessageListByID(
 			@PathVariable("sendMessageID") String sendMessageID) {
 		Optional<SendMessage> SendMessageOptional = sendMessageService.findById(Long.parseLong(sendMessageID));
 
