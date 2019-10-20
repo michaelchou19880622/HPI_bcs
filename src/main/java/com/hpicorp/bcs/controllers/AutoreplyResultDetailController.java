@@ -1,7 +1,9 @@
 package com.hpicorp.bcs.controllers;
 
 import java.util.Date;
+
 import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,9 +15,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.hpicorp.bcs.common.DateTimeModel;
+
 import com.hpicorp.bcs.entities.dto.CustomAutoreplyDetail;
 import com.hpicorp.bcs.services.AutoreplyResultModelService;
+import com.hpicorp.core.common.DateTimeModel;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -45,8 +49,8 @@ public class AutoreplyResultDetailController {
 			return ResponseEntity.badRequest().body("id can't be null");
 		}
 		try {
-			since = since == null ? DateTimeModel.initialDate() : DateTimeModel.minimizeTime(since);
-			untils = untils == null ? DateTimeModel.maximumTime(new Date()) : DateTimeModel.maximumTime(untils);
+			since = since == null ? DateTimeModel.getDate() : DateTimeModel.minimizeTimeOfDate(since);
+			untils = untils == null ? DateTimeModel.maximumTimeOfDate(new Date()) : DateTimeModel.maximumTimeOfDate(untils);
 			Page<CustomAutoreplyDetail> result = this.autoreplyResultModelService.getAutoreplyDetailDateCountByPage(mappingId, since, untils, pageable);
 			return ResponseEntity.ok().body(result);
 		} catch (Exception e) {
@@ -71,8 +75,8 @@ public class AutoreplyResultDetailController {
 			return ResponseEntity.badRequest().body("id can't be null");
 		}
 		try {
-			since = since == null ? DateTimeModel.initialDate() : DateTimeModel.minimizeTime(since);
-			untils = untils == null ? DateTimeModel.maximumTime(new Date()) : DateTimeModel.maximumTime(untils);
+			since = since == null ? DateTimeModel.getDate() : DateTimeModel.minimizeTimeOfDate(since);
+			untils = untils == null ? DateTimeModel.maximumTimeOfDate(new Date()) : DateTimeModel.maximumTimeOfDate(untils);
 			this.autoreplyResultModelService.exportUidByAutoreplyIdAndBetweenDate(mappingId, since, untils, response);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
@@ -98,8 +102,8 @@ public class AutoreplyResultDetailController {
 			return ResponseEntity.badRequest().body("id can't be null");
 		}
 		try {
-			since = since == null ? DateTimeModel.initialDate() : DateTimeModel.minimizeTime(since);
-			untils = untils == null ? DateTimeModel.maximumTime(new Date()) : DateTimeModel.maximumTime(untils);
+			since = since == null ? DateTimeModel.getDate() : DateTimeModel.minimizeTimeOfDate(since);
+			untils = untils == null ? DateTimeModel.maximumTimeOfDate(new Date()) : DateTimeModel.maximumTimeOfDate(untils);
 			this.autoreplyResultModelService.exportCsvByAutoreplyIdAndBetweenDate(mappingId, since, untils, response);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {

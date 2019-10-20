@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.hpicorp.bcs.common.DateTimeModel;
+
 import com.hpicorp.bcs.entities.dto.AutoreplyResultBody;
 import com.hpicorp.bcs.services.AutoreplyResultModelService;
+import com.hpicorp.core.common.DateTimeModel;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,7 +43,7 @@ public class AutoreplyResultController {
 			page = 0;
 		}
 		try {
-			period = period == null ? DateTimeModel.initialDate() : period;
+			period = period == null ? DateTimeModel.getDate() : period;
 			AutoreplyResultBody body = new AutoreplyResultBody(keyword, period, page);
 			Map<String, Object> content = model.getByAutoreplyResultBody(body);
 			return ResponseEntity.ok(content);

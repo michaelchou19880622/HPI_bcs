@@ -24,8 +24,13 @@
 	</properties>
 
 	<dependencies>
-
-		<!-- SpringBoot Core -->
+		<!-- 引入 Core -->
+		<dependency>
+			<groupId>com.hpicorp</groupId>
+			<artifactId>bcs_core</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<!-- 引入 SpringBoot Core -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -36,26 +41,22 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		<!-- SpringBoot Test -->
+		<!-- 引入 SpringBoot Starter Test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		<!-- SpringBoot Data JPA -->
+		<!-- 引入 SpringBoot JPA Data -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-
 		<!-- SpringBoot jdbc -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
-
 		<!-- SpringBoot Auto Compiler -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -20,16 +20,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hpicorp.bcs.entities.Autoreply;
-import com.hpicorp.bcs.entities.AutoreplyDetail;
-import com.hpicorp.bcs.entities.AutoreplyMessageList;
-import com.hpicorp.bcs.entities.MessageAudio;
-import com.hpicorp.bcs.entities.MessageImage;
-import com.hpicorp.bcs.entities.MessageSticker;
-import com.hpicorp.bcs.entities.MessageTemplate;
-import com.hpicorp.bcs.entities.MessageTemplateAction;
-import com.hpicorp.bcs.entities.MessageText;
-import com.hpicorp.bcs.entities.MessageVideo;
 import com.hpicorp.bcs.enums.MessageType;
 import com.hpicorp.bcs.services.AutoreplyMessageListService;
 import com.hpicorp.bcs.services.AutoreplyService;
@@ -39,6 +29,16 @@ import com.hpicorp.bcs.services.MessageStickerService;
 import com.hpicorp.bcs.services.MessageTemplateService;
 import com.hpicorp.bcs.services.MessageTextService;
 import com.hpicorp.bcs.services.MessageVideoService;
+import com.hpicorp.core.entities.Autoreply;
+import com.hpicorp.core.entities.AutoreplyDetail;
+import com.hpicorp.core.entities.AutoreplyMessageList;
+import com.hpicorp.core.entities.MessageAudio;
+import com.hpicorp.core.entities.MessageImage;
+import com.hpicorp.core.entities.MessageSticker;
+import com.hpicorp.core.entities.MessageTemplate;
+import com.hpicorp.core.entities.MessageTemplateAction;
+import com.hpicorp.core.entities.MessageText;
+import com.hpicorp.core.entities.MessageVideo;
 
 import lombok.extern.slf4j.Slf4j;
 
