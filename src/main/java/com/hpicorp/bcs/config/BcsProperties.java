@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Component
-public class ApProperties {
+public class BcsProperties {
 	
 	@Value("${ap.endpoint}")
 	private String endpoint;

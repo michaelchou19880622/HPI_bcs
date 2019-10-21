@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hpicorp.bcs.entities.SystemUser;
-import com.hpicorp.bcs.repositories.SystemUserRepository;
+import com.hpicorp.core.entities.SystemUser;
+import com.hpicorp.core.repository.SystemUserRepository;
 
 import lombok.extern.slf4j.Slf4j;
 

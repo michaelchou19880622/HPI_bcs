@@ -16,19 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.hpicorp.bcs.entities.AutoreplyMessageList;
-import com.hpicorp.bcs.entities.MessageAudio;
-import com.hpicorp.bcs.entities.MessageCarouselAction;
-import com.hpicorp.bcs.entities.MessageCarouselColumn;
-import com.hpicorp.bcs.entities.MessageCarouselTemplate;
-import com.hpicorp.bcs.entities.MessageImage;
-import com.hpicorp.bcs.entities.MessageImageMap;
-import com.hpicorp.bcs.entities.MessageSticker;
-import com.hpicorp.bcs.entities.MessageTemplate;
-import com.hpicorp.bcs.entities.MessageTemplateAction;
-import com.hpicorp.bcs.entities.MessageText;
-import com.hpicorp.bcs.entities.MessageVideo;
-import com.hpicorp.bcs.enums.MessageType;
 import com.hpicorp.bcs.services.AutoreplyMessageListService;
 import com.hpicorp.bcs.services.MessageAudioService;
 import com.hpicorp.bcs.services.MessageCarouselTemplateService;
@@ -38,6 +25,19 @@ import com.hpicorp.bcs.services.MessageStickerService;
 import com.hpicorp.bcs.services.MessageTemplateService;
 import com.hpicorp.bcs.services.MessageTextService;
 import com.hpicorp.bcs.services.MessageVideoService;
+import com.hpicorp.core.entities.AutoreplyMessageList;
+import com.hpicorp.core.entities.MessageAudio;
+import com.hpicorp.core.entities.MessageCarouselAction;
+import com.hpicorp.core.entities.MessageCarouselColumn;
+import com.hpicorp.core.entities.MessageCarouselTemplate;
+import com.hpicorp.core.entities.MessageImage;
+import com.hpicorp.core.entities.MessageImageMap;
+import com.hpicorp.core.entities.MessageSticker;
+import com.hpicorp.core.entities.MessageTemplate;
+import com.hpicorp.core.entities.MessageTemplateAction;
+import com.hpicorp.core.entities.MessageText;
+import com.hpicorp.core.entities.MessageVideo;
+import com.hpicorp.core.enums.MessageTypes;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -102,40 +102,40 @@ public class MessageAddController {
 			for (AutoreplyMessageList am : list) {
 				id = String.valueOf(am.getId());
 				msgType = am.getMessageType();
-				if (am.getMessageType().equals(MessageType.TEXT.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.TEXT.getValue())) {
 					Optional<MessageText> obj = messageTextService.findById(am.getMessageId());
 					if (obj.isPresent())
 						txtmsg = obj.get().getText();
 				}
-				if (am.getMessageType().equals(MessageType.IMAGE.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.IMAGE.getValue())) {
 					Optional<MessageImage> obj = messageImageService.findById(am.getMessageId());
 					if (obj.isPresent()) {
 						imageurl = obj.get().getOriginalContentUrl();
 						previewurl = obj.get().getPreviewImageUrl();
 					}
 				}
-				if (am.getMessageType().equals(MessageType.VIDEO.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.VIDEO.getValue())) {
 					Optional<MessageVideo> obj = messageVideoService.findById(am.getMessageId());
 					if (obj.isPresent()) {
 						videourl = obj.get().getOriginalContentUrl();
 						previewurl = obj.get().getPreviewImageUrl();
 					}
 				}
-				if (am.getMessageType().equals(MessageType.AUDIO.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.AUDIO.getValue())) {
 					Optional<MessageAudio> obj = messageAudioService.findById(am.getMessageId());
 					if (obj.isPresent()) {
 						audiourl = obj.get().getOriginalContentUrl();
 						audioDuration = String.valueOf(obj.get().getDuration());
 					}
 				}
-				if (am.getMessageType().equals(MessageType.STICKER.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.STICKER.getValue())) {
 					Optional<MessageSticker> obj = messageStickerService.findById(am.getMessageId());
 					if (obj.isPresent()) {
 						packageid = String.valueOf(obj.get().getPackageId());
 						stickerid = obj.get().getStickerId();
 					}
 				}
-				if (am.getMessageType().equals(MessageType.IMAGEMAP.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.IMAGEMAP.getValue())) {
 					Optional<MessageImageMap> obj = messageImageMapService.findById(am.getMessageId());
 					if (obj.isPresent()) {
 						imagemapid = String.valueOf(am.getMessageId());
@@ -143,7 +143,7 @@ public class MessageAddController {
 						imageurl = obj.get().getBaseUrl();
 					}
 				}
-				if (am.getMessageType().equals(MessageType.TEMPLATE.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.TEMPLATE.getValue())) {
 					templateid = String.valueOf(am.getMessageId());
 					Optional<MessageTemplate> obj = messageTemplateService.findById(am.getMessageId());
 					if (obj.isPresent()) {
@@ -159,7 +159,7 @@ public class MessageAddController {
 				}
 				JsonArray colobj = new JsonArray();
 				List<MessageCarouselColumn> columnlist = new ArrayList<>();
-				if (am.getMessageType().equals(MessageType.CAROUSEL.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.CAROUSEL.getValue())) {
 					templateid = String.valueOf(am.getMessageId());
 					Optional<MessageCarouselTemplate> obj = messageCarouselTemplateService.findById(am.getMessageId());
 					if (obj.isPresent()) {

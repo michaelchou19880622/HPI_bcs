@@ -15,10 +15,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hpicorp.bcs.entities.SendMessage;
-import com.hpicorp.bcs.repositories.LineUserGroupRepository;
-import com.hpicorp.bcs.repositories.SendMessageRepository;
-import com.hpicorp.bcs.repositories.SendMessageUsersRepository;
+import com.hpicorp.core.entities.SendMessage;
+import com.hpicorp.core.repository.LineUserGroupRepository;
+import com.hpicorp.core.repository.SendMessageRepository;
+import com.hpicorp.core.repository.SendMessageUsersRepository;
 
 import lombok.extern.slf4j.Slf4j;
 

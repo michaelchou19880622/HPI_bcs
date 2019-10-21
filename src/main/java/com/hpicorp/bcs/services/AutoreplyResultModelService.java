@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,11 +16,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import com.hpicorp.bcs.common.CsvGenerator;
-import com.hpicorp.bcs.entities.dto.AutoreplyResultBody;
-import com.hpicorp.bcs.entities.dto.CustomAutoreplyDetail;
-import com.hpicorp.bcs.enums.DefaultConfig;
-import com.hpicorp.bcs.enums.UserClickType;
+
+import com.hpicorp.core.common.CsvGenerator;
+import com.hpicorp.core.dto.AutoreplyResultBody;
+import com.hpicorp.core.dto.CustomAutoreplyDetail;
+import com.hpicorp.core.enums.DefaultConfig;
+import com.hpicorp.core.enums.UserClickType;
 
 @Service
 @Component

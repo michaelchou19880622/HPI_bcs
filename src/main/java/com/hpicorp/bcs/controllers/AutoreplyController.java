@@ -20,13 +20,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hpicorp.bcs.enums.MessageType;
 import com.hpicorp.bcs.services.AutoreplyMessageListService;
 import com.hpicorp.bcs.services.AutoreplyService;
 import com.hpicorp.bcs.services.MessageAudioService;
 import com.hpicorp.bcs.services.MessageImageService;
 import com.hpicorp.bcs.services.MessageStickerService;
-import com.hpicorp.bcs.services.MessageTemplateService;
 import com.hpicorp.bcs.services.MessageTextService;
 import com.hpicorp.bcs.services.MessageVideoService;
 import com.hpicorp.core.entities.Autoreply;
@@ -35,10 +33,9 @@ import com.hpicorp.core.entities.AutoreplyMessageList;
 import com.hpicorp.core.entities.MessageAudio;
 import com.hpicorp.core.entities.MessageImage;
 import com.hpicorp.core.entities.MessageSticker;
-import com.hpicorp.core.entities.MessageTemplate;
-import com.hpicorp.core.entities.MessageTemplateAction;
 import com.hpicorp.core.entities.MessageText;
 import com.hpicorp.core.entities.MessageVideo;
+import com.hpicorp.core.enums.MessageTypes;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,9 +67,6 @@ public class AutoreplyController {
 
 	@Autowired
 	private MessageImageService messageImageService;
-
-	@Autowired
-	private MessageTemplateService messageTemplateService;
 
 	/**
 	 * [Read List]關鍵字列表
@@ -131,34 +125,27 @@ public class AutoreplyController {
 			for (AutoreplyMessageList am : autoreply.getAutoreplyMessageList()) {
 				am.setAutoreply(autoreply);
 				String[] typelist = am.getMessageType().split(";");
-				if (typelist[0].trim().equals(MessageType.TEXT.getValue())) {
+				if (typelist[0].trim().equals(MessageTypes.TEXT.getValue())) {
 					MessageText txt = am.getMessageTextList().get(0);
 					messageTextService.insert(txt);
 					am.setMessageId(txt.getId());
-				} else if (typelist[0].trim().equals(MessageType.IMAGE.getValue())) {
+				} else if (typelist[0].trim().equals(MessageTypes.IMAGE.getValue())) {
 					MessageImage img = am.getMessageImageList().get(0);
 					messageImageService.insert(img);
 					am.setMessageId(img.getId());
-				} else if (typelist[0].trim().equals(MessageType.VIDEO.getValue())) {
+				} else if (typelist[0].trim().equals(MessageTypes.VIDEO.getValue())) {
 					MessageVideo video = am.getMessageVideoList().get(0);
 					messageVideoService.insert(video);
 					am.setMessageId(video.getId());
-				} else if (typelist[0].trim().equals(MessageType.AUDIO.getValue())) {
+				} else if (typelist[0].trim().equals(MessageTypes.AUDIO.getValue())) {
 					MessageAudio audio = am.getMessageAudioList().get(0);
 					messageAudioService.insert(audio);
 					am.setMessageId(audio.getId());
-				} else if (typelist[0].trim().equals(MessageType.STICKER.getValue())) {
+				} else if (typelist[0].trim().equals(MessageTypes.STICKER.getValue())) {
 					MessageSticker sticker = am.getMessageStickerList().get(0);
 					messageStickerService.insert(sticker);
 					am.setMessageId(sticker.getId());
-				} else if (typelist[0].trim().equals(MessageType.LINK.getValue())) {
-					MessageTemplate messageTemplate = am.getMessageTemplateList().get(0);
-					for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
-						d.setMessageTemplate(messageTemplate);
-					}
-					messageTemplateService.insert(messageTemplate);
-					am.setMessageId(messageTemplate.getId());
-					typelist[0] = MessageType.TEMPLATE.getValue();
+				} else {
 				}
 				am.setOrderNum(Integer.parseInt(typelist[1], 10));
 				am.setMessageType(typelist[0].trim());
@@ -209,8 +196,8 @@ public class AutoreplyController {
 			String[] typelist = am.getMessageType().split(";");
 			boolean runUpdate = true;
 
-			processByMessageType(typelist[0].trim(), am);
-			if (typelist[0].trim().equals(MessageType.TEMPLATE.getValue())) {
+			processByMessageTypes(typelist[0].trim(), am);
+			if (typelist[0].trim().equals(MessageTypes.TEMPLATE.getValue())) {
 				for (AutoreplyMessageList am1 : list) {
 					if (am1.getId() == am.getId() && am1.getMessageId() == am.getMessageId())
 						runUpdate = false;
@@ -279,37 +266,29 @@ public class AutoreplyController {
 	 * @param msgtype
 	 * @param am
 	 */
-	private void processByMessageType(String msgtype, AutoreplyMessageList am) {
-		if (msgtype.equals(MessageType.TEXT.getValue())) {
+	private void processByMessageTypes(String msgtype, AutoreplyMessageList am) {
+		if (msgtype.equals(MessageTypes.TEXT.getValue())) {
 			MessageText txt = am.getMessageTextList().get(0);
 			messageTextService.insert(txt);
 			am.setMessageId(txt.getId());
-		} else if (msgtype.trim().equals(MessageType.IMAGE.getValue())) {
+		} else if (msgtype.trim().equals(MessageTypes.IMAGE.getValue())) {
 			MessageImage img = am.getMessageImageList().get(0);
 			messageImageService.insert(img);
 			am.setMessageId(img.getId());
-		} else if (msgtype.trim().equals(MessageType.VIDEO.getValue())) {
+		} else if (msgtype.trim().equals(MessageTypes.VIDEO.getValue())) {
 			MessageVideo video = am.getMessageVideoList().get(0);
 			messageVideoService.insert(video);
 			am.setMessageId(video.getId());
-		} else if (msgtype.trim().equals(MessageType.AUDIO.getValue())) {
+		} else if (msgtype.trim().equals(MessageTypes.AUDIO.getValue())) {
 			MessageAudio audio = am.getMessageAudioList().get(0);
 			messageAudioService.insert(audio);
 			am.setMessageId(audio.getId());
-		} else if (msgtype.trim().equals(MessageType.STICKER.getValue())) {
+		} else if (msgtype.trim().equals(MessageTypes.STICKER.getValue())) {
 			MessageSticker sticker = am.getMessageStickerList().get(0);
 			messageStickerService.insert(sticker);
 			am.setMessageId(sticker.getId());
-		} else if (msgtype.trim().equals(MessageType.LINK.getValue())) {
-			MessageTemplate messageTemplate = am.getMessageTemplateList().get(0);
-			for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
-				d.setMessageTemplate(messageTemplate);
-			}
-			messageTemplateService.insert(messageTemplate);
-			am.setMessageId(messageTemplate.getId());
-			msgtype = MessageType.TEMPLATE.getValue();
+		} else {
 		}
-
 		am.setMessageType(msgtype.trim());
 	}
 

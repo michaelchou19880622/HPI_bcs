@@ -8,7 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hpicorp.bcs.enums.LineUserTrackSource;
+import com.hpicorp.core.enums.LineUserTrackSource;
 
 @Service
 public class UserResultLogModelService {

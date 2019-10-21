@@ -4,12 +4,14 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-import com.hpicorp.bcs.entities.LineUserTrack;
-import com.hpicorp.bcs.enums.LineUserTrackSource;
-import com.hpicorp.bcs.repositories.LineUserTrackRepository;
+
+import com.hpicorp.core.entities.LineUserTrack;
+import com.hpicorp.core.enums.LineUserTrackSource;
+import com.hpicorp.core.repository.LineUserTrackRepository;
 
 
 @Component

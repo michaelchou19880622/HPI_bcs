@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hpicorp.bcs.config.StorageConfig;
-import com.hpicorp.bcs.exception.StorageException;
 import com.hpicorp.bcs.storage.StorageService;
+import com.hpicorp.core.exception.StorageException;
 
 @Service
 public class StorageServiceImpl implements StorageService {

@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hpicorp.bcs.entities.SystemUser;
-import com.hpicorp.bcs.entities.dto.ApiResponse;
-import com.hpicorp.bcs.repositories.SystemUserRepository;
-import com.hpicorp.bcs.repositories.SystemUserRoleRepository;
+import com.hpicorp.core.dto.ApiResponse;
+import com.hpicorp.core.entities.SystemUser;
+import com.hpicorp.core.repository.SystemUserRepository;
+import com.hpicorp.core.repository.SystemUserRoleRepository;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController

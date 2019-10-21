@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hpicorp.bcs.repositories.LineUserRepository;
 import com.hpicorp.core.entities.LineUser;
+import com.hpicorp.core.repository.LineUserRepository;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController

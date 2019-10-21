@@ -28,23 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.hpicorp.bcs.entities.MessageAudio;
-import com.hpicorp.bcs.entities.MessageCarouselAction;
-import com.hpicorp.bcs.entities.MessageCarouselColumn;
-import com.hpicorp.bcs.entities.MessageCarouselTemplate;
-import com.hpicorp.bcs.entities.MessageImage;
-import com.hpicorp.bcs.entities.MessageImageMap;
-import com.hpicorp.bcs.entities.MessageSticker;
-import com.hpicorp.bcs.entities.MessageTemplate;
-import com.hpicorp.bcs.entities.MessageTemplateAction;
-import com.hpicorp.bcs.entities.MessageText;
-import com.hpicorp.bcs.entities.MessageVideo;
-import com.hpicorp.bcs.entities.SendMessage;
-import com.hpicorp.bcs.entities.SendMessageList;
-import com.hpicorp.bcs.entities.SystemUser;
-import com.hpicorp.bcs.enums.MessageType;
-import com.hpicorp.bcs.repositories.LineUserRepository;
-import com.hpicorp.bcs.repositories.SystemUserRepository;
 import com.hpicorp.bcs.services.MessageAudioService;
 import com.hpicorp.bcs.services.MessageCarouselTemplateService;
 import com.hpicorp.bcs.services.MessageImageMapService;
@@ -55,6 +38,23 @@ import com.hpicorp.bcs.services.MessageTextService;
 import com.hpicorp.bcs.services.MessageVideoService;
 import com.hpicorp.bcs.services.SendMessageListService;
 import com.hpicorp.bcs.services.SendMessageService;
+import com.hpicorp.core.entities.MessageAudio;
+import com.hpicorp.core.entities.MessageCarouselAction;
+import com.hpicorp.core.entities.MessageCarouselColumn;
+import com.hpicorp.core.entities.MessageCarouselTemplate;
+import com.hpicorp.core.entities.MessageImage;
+import com.hpicorp.core.entities.MessageImageMap;
+import com.hpicorp.core.entities.MessageSticker;
+import com.hpicorp.core.entities.MessageTemplate;
+import com.hpicorp.core.entities.MessageTemplateAction;
+import com.hpicorp.core.entities.MessageText;
+import com.hpicorp.core.entities.MessageVideo;
+import com.hpicorp.core.entities.SendMessage;
+import com.hpicorp.core.entities.SendMessageList;
+import com.hpicorp.core.entities.SystemUser;
+import com.hpicorp.core.enums.MessageTypes;
+import com.hpicorp.core.repository.LineUserRepository;
+import com.hpicorp.core.repository.SystemUserRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -166,35 +166,27 @@ public class SendMessageController {
 		for (SendMessageList am : sendMessage.getSendMessageList()) {
 			log.info("getMessageVideoList:" + am.getMessageType());
 			String[] typelist = am.getMessageType().split(";");
-			if (typelist[0].trim().equals(MessageType.TEXT.getValue())) {
+			if (typelist[0].trim().equals(MessageTypes.TEXT.getValue())) {
 				MessageText txt = am.getMessageTextList().get(0);
 				messageTextService.insert(txt);
 				am.setMessageId(txt.getId());
-			} else if (typelist[0].trim().equals(MessageType.IMAGE.getValue())) {
+			} else if (typelist[0].trim().equals(MessageTypes.IMAGE.getValue())) {
 				MessageImage img = am.getMessageImageList().get(0);
 				messageImageService.insert(img);
 				am.setMessageId(img.getId());
-			} else if (typelist[0].trim().equals(MessageType.VIDEO.getValue())) {
+			} else if (typelist[0].trim().equals(MessageTypes.VIDEO.getValue())) {
 				MessageVideo video = am.getMessageVideoList().get(0);
 				messageVideoService.insert(video);
 				am.setMessageId(video.getId());
-			} else if (typelist[0].trim().equals(MessageType.AUDIO.getValue())) {
+			} else if (typelist[0].trim().equals(MessageTypes.AUDIO.getValue())) {
 				MessageAudio audio = am.getMessageAudioList().get(0);
 				messageAudioService.insert(audio);
 				am.setMessageId(audio.getId());
-			} else if (typelist[0].trim().equals(MessageType.STICKER.getValue())) {
+			} else if (typelist[0].trim().equals(MessageTypes.STICKER.getValue())) {
 				MessageSticker sticker = am.getMessageStickerList().get(0);
 				messageStickerService.insert(sticker);
 				am.setMessageId(sticker.getId());
-			} else if (typelist[0].trim().equals(MessageType.LINK.getValue())) {
-				MessageTemplate messageTemplate = am.getMessageTemplateList().get(0);
-				for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
-					d.setLabel(d.getText());
-					d.setMessageTemplate(messageTemplate);
-				}
-				messageTemplateService.insert(messageTemplate);
-				am.setMessageId(messageTemplate.getId());
-				typelist[0] = MessageType.TEMPLATE.getValue();
+			} else {
 			}
 			am.setOrderIndex(Integer.parseInt(typelist[1], 10));
 			am.setMessageType(typelist[0].trim());
@@ -283,35 +275,27 @@ public class SendMessageController {
 			String[] typelist = am.getMessageType().split(";");
 			boolean runUpdate = true;
 
-			if (typelist[0].trim().equals(MessageType.TEXT.getValue())) {
+			if (typelist[0].trim().equals(MessageTypes.TEXT.getValue())) {
 				MessageText txt = am.getMessageTextList().get(0);
 				messageTextService.insert(txt);
 				am.setMessageId(txt.getId());
-			} else if (typelist[0].trim().equals(MessageType.IMAGE.getValue())) {
+			} else if (typelist[0].trim().equals(MessageTypes.IMAGE.getValue())) {
 				MessageImage img = am.getMessageImageList().get(0);
 				messageImageService.insert(img);
 				am.setMessageId(img.getId());
-			} else if (typelist[0].trim().equals(MessageType.VIDEO.getValue())) {
+			} else if (typelist[0].trim().equals(MessageTypes.VIDEO.getValue())) {
 				MessageVideo video = am.getMessageVideoList().get(0);
 				messageVideoService.insert(video);
 				am.setMessageId(video.getId());
-			} else if (typelist[0].trim().equals(MessageType.AUDIO.getValue())) {
+			} else if (typelist[0].trim().equals(MessageTypes.AUDIO.getValue())) {
 				MessageAudio audio = am.getMessageAudioList().get(0);
 				messageAudioService.insert(audio);
 				am.setMessageId(audio.getId());
-			} else if (typelist[0].trim().equals(MessageType.STICKER.getValue())) {
+			} else if (typelist[0].trim().equals(MessageTypes.STICKER.getValue())) {
 				MessageSticker sticker = am.getMessageStickerList().get(0);
 				messageStickerService.insert(sticker);
 				am.setMessageId(sticker.getId());
-			} else if (typelist[0].trim().equals(MessageType.LINK.getValue())) {
-				MessageTemplate messageTemplate = am.getMessageTemplateList().get(0);
-				for (MessageTemplateAction d : messageTemplate.getMessageTemplateActionList()) {
-					d.setMessageTemplate(messageTemplate);
-				}
-				messageTemplateService.insert(messageTemplate);
-				am.setMessageId(messageTemplate.getId());
-				typelist[0] = MessageType.TEMPLATE.getValue();
-			} else if (typelist[0].trim().equals(MessageType.TEMPLATE.getValue())) {
+			} else if (typelist[0].trim().equals(MessageTypes.TEMPLATE.getValue())) {
 				for (SendMessageList am1 : list) {
 					if (am1.getId() == am.getId() && am1.getMessageId() == am.getMessageId())
 						runUpdate = false;
@@ -367,37 +351,37 @@ public class SendMessageController {
 			for (SendMessageList am : list) {
 				id = String.valueOf(am.getId());
 				msgType = am.getMessageType();
-				if (am.getMessageType().equals(MessageType.TEXT.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.TEXT.getValue())) {
 					Optional<MessageText> obj = messageTextService.findById(am.getMessageId().longValue());
 					txtmsg = obj.get().getText();
 				}
-				if (am.getMessageType().equals(MessageType.IMAGE.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.IMAGE.getValue())) {
 					Optional<MessageImage> obj = messageImageService.findById(am.getMessageId().longValue());
 					imageurl = obj.get().getOriginalContentUrl();
 					previewurl = obj.get().getPreviewImageUrl();
 				}
-				if (am.getMessageType().equals(MessageType.VIDEO.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.VIDEO.getValue())) {
 					Optional<MessageVideo> obj = messageVideoService.findById(am.getMessageId().longValue());
 					videourl = obj.get().getOriginalContentUrl();
 					previewurl = obj.get().getPreviewImageUrl();
 				}
-				if (am.getMessageType().equals(MessageType.AUDIO.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.AUDIO.getValue())) {
 					Optional<MessageAudio> obj = messageAudioService.findById(am.getMessageId().longValue());
 					audiourl = obj.get().getOriginalContentUrl();
 					audioDuration = String.valueOf(obj.get().getDuration());
 				}
-				if (am.getMessageType().equals(MessageType.STICKER.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.STICKER.getValue())) {
 					Optional<MessageSticker> obj = messageStickerService.findById(am.getMessageId().longValue());
 					packageid = String.valueOf(obj.get().getPackageId());
 					stickerid = obj.get().getStickerId();
 				}
-				if (am.getMessageType().equals(MessageType.IMAGEMAP.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.IMAGEMAP.getValue())) {
 					Optional<MessageImageMap> obj = messageImageMapService.findById(am.getMessageId());
 					imagemapid = String.valueOf(am.getMessageId());
 					titleText = obj.get().getAltText();
 					imageurl = obj.get().getBaseUrl();
 				}
-				if (am.getMessageType().equals(MessageType.TEMPLATE.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.TEMPLATE.getValue())) {
 					templateid = String.valueOf(am.getMessageId());
 					Optional<MessageTemplate> obj = messageTemplateService.findById(am.getMessageId());
 					titleText = obj.get().getAltText();
@@ -410,7 +394,7 @@ public class SendMessageController {
 				}
 				JsonArray colobj = new JsonArray();
 				List<MessageCarouselColumn> columnlist = new ArrayList<MessageCarouselColumn>();
-				if (am.getMessageType().equals(MessageType.CAROUSEL.getValue())) {
+				if (am.getMessageType().equals(MessageTypes.CAROUSEL.getValue())) {
 					templateid = String.valueOf(am.getMessageId());
 					Optional<MessageCarouselTemplate> obj = messageCarouselTemplateService.findById(am.getMessageId());
 					titleText = obj.get().getAltText();

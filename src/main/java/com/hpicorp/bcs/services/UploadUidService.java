@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.hpicorp.bcs.entities.UploadUid;
-import com.hpicorp.bcs.repositories.UploadUidRepository;
+import com.hpicorp.core.entities.UploadUid;
+import com.hpicorp.core.repository.UploadUidRepository;
 
 @Service
 public class UploadUidService {

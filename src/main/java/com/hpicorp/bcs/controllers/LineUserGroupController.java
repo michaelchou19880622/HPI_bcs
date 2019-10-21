@@ -35,11 +35,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hpicorp.bcs.repositories.LineUserGroupRepository;
 import com.hpicorp.bcs.services.AzureCDNService;
 import com.hpicorp.bcs.services.UploadUidService;
 import com.hpicorp.core.entities.LineUserGroup;
 import com.hpicorp.core.entities.UploadUid;
+import com.hpicorp.core.repository.LineUserGroupRepository;
 
 import lombok.extern.slf4j.Slf4j;
 

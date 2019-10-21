@@ -1,10 +1,12 @@
 package com.hpicorp.bcs.services;
 
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.hpicorp.bcs.entities.MessageVideo;
-import com.hpicorp.bcs.repositories.MessageVideoRepository;
+
+import com.hpicorp.core.entities.MessageVideo;
+import com.hpicorp.core.repository.MessageVideoRepository;
 
 @Service
 public class MessageVideoService {

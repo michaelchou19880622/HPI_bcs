@@ -1,11 +1,12 @@
 package com.hpicorp.bcs.services;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hpicorp.bcs.entities.SendMessageList;
-import com.hpicorp.bcs.repositories.SendMessageListRepository;
+import com.hpicorp.core.entities.SendMessageList;
+import com.hpicorp.core.repository.SendMessageListRepository;
 
 @Service
 public class SendMessageListService {

@@ -7,7 +7,9 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
 import javax.imageio.ImageIO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,10 +24,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.hpicorp.bcs.entities.MessageCarouselAction;
-import com.hpicorp.bcs.entities.MessageCarouselColumn;
-import com.hpicorp.bcs.entities.MessageCarouselTemplate;
+
 import com.hpicorp.bcs.services.MessageCarouselTemplateService;
+import com.hpicorp.core.entities.MessageCarouselAction;
+import com.hpicorp.core.entities.MessageCarouselColumn;
+import com.hpicorp.core.entities.MessageCarouselTemplate;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

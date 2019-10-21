@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hpicorp.bcs.entities.SystemUserRole;
-import com.hpicorp.bcs.repositories.SystemUserRoleRepository;
+import com.hpicorp.core.entities.SystemUserRole;
+import com.hpicorp.core.repository.SystemUserRoleRepository;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController

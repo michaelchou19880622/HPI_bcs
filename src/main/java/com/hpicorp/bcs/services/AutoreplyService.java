@@ -2,13 +2,15 @@ package com.hpicorp.bcs.services;
 
 import java.util.Date;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.hpicorp.bcs.entities.Autoreply;
-import com.hpicorp.bcs.repositories.AutoreplyDetailRepository;
-import com.hpicorp.bcs.repositories.AutoreplyRepository;
+
+import com.hpicorp.core.entities.Autoreply;
+import com.hpicorp.core.repository.AutoreplyDetailRepository;
+import com.hpicorp.core.repository.AutoreplyRepository;
 
 @Service
 public class AutoreplyService {

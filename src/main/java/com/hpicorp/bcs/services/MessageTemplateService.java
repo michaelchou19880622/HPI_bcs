@@ -2,15 +2,17 @@ package com.hpicorp.bcs.services;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.hpicorp.bcs.entities.MessageTemplate;
-import com.hpicorp.bcs.entities.MessageTemplateAction;
-import com.hpicorp.bcs.enums.MessageTemplateTypes;
-import com.hpicorp.bcs.repositories.MessageTemplateActionRepository;
-import com.hpicorp.bcs.repositories.MessageTemplateRepository;
+
+import com.hpicorp.core.entities.MessageTemplate;
+import com.hpicorp.core.entities.MessageTemplateAction;
+import com.hpicorp.core.enums.MessageTemplateTypes;
+import com.hpicorp.core.repository.MessageTemplateActionRepository;
+import com.hpicorp.core.repository.MessageTemplateRepository;
 
 @Service
 public class MessageTemplateService {

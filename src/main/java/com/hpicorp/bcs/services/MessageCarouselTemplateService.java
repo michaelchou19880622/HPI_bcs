@@ -8,12 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.hpicorp.bcs.entities.MessageCarouselAction;
-import com.hpicorp.bcs.entities.MessageCarouselColumn;
-import com.hpicorp.bcs.entities.MessageCarouselTemplate;
-import com.hpicorp.bcs.repositories.MessageCarouselActionRepository;
-import com.hpicorp.bcs.repositories.MessageCarouselColumnRepository;
-import com.hpicorp.bcs.repositories.MessageCarouselTemplateRepository;
+import com.hpicorp.core.entities.MessageCarouselAction;
+import com.hpicorp.core.entities.MessageCarouselColumn;
+import com.hpicorp.core.entities.MessageCarouselTemplate;
+import com.hpicorp.core.repository.MessageCarouselActionRepository;
+import com.hpicorp.core.repository.MessageCarouselColumnRepository;
+import com.hpicorp.core.repository.MessageCarouselTemplateRepository;
 
 @Service
 public class MessageCarouselTemplateService {

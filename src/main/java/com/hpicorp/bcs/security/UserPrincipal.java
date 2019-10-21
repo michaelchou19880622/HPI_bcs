@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hpicorp.bcs.entities.SystemUser;
+import com.hpicorp.core.entities.SystemUser;
 
 public class UserPrincipal implements UserDetails {
 	

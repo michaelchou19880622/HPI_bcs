@@ -2,14 +2,16 @@ package com.hpicorp.bcs.services;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.hpicorp.bcs.entities.MessageImageMap;
-import com.hpicorp.bcs.entities.MessageImageMapAction;
-import com.hpicorp.bcs.repositories.MessageImageMapRepository;
-import com.hpicorp.bcs.repositories.MessageImagemapActionRepository;
+
+import com.hpicorp.core.entities.MessageImageMap;
+import com.hpicorp.core.entities.MessageImageMapAction;
+import com.hpicorp.core.repository.MessageImageMapRepository;
+import com.hpicorp.core.repository.MessageImagemapActionRepository;
 
 @Service
 public class MessageImageMapService {

@@ -1,11 +1,12 @@
 package com.hpicorp.bcs.services;
 
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hpicorp.bcs.entities.LineUser;
-import com.hpicorp.bcs.repositories.LineUserRepository;
+import com.hpicorp.core.entities.LineUser;
+import com.hpicorp.core.repository.LineUserRepository;
 
 @Service
 public class LineUserService {
