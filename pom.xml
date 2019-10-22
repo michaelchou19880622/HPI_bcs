@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hpicorp</groupId>
-	<artifactId>bcs</artifactId>
+	<artifactId>Richart_bcs</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>bcs</name>
+	<name>Richart_bcs</name>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -154,7 +154,11 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
         </dependency>
-
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 	</dependencies>
 
 	<repositories>
