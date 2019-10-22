@@ -141,6 +141,19 @@
 			<artifactId>microsoft-windowsazure-api</artifactId>
 			<version>0.4.6</version>
 		</dependency>
+		<!-- 引入 Quartz -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+		</dependency>
+		<dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
 
 	</dependencies>
 
