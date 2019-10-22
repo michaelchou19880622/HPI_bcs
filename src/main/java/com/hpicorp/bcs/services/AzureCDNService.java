@@ -27,7 +27,7 @@ public class AzureCDNService {
 
 		CloudBlobClient blobClient = account.createCloudBlobClient();
 		
-		CloudBlobContainer container = blobClient.getContainerReference("upload");
+		CloudBlobContainer container = blobClient.getContainerReference("booster5");
 
 		CloudBlockBlob blob = container.getBlockBlobReference(fileName);
 
@@ -43,7 +43,7 @@ public class AzureCDNService {
 
 		CloudBlobClient blobClient = account.createCloudBlobClient();
 
-		CloudBlobContainer container = blobClient.getContainerReference("upload");
+		CloudBlobContainer container = blobClient.getContainerReference("booster5");
 
 		File file = new File(path + "/" + fileName);
 
