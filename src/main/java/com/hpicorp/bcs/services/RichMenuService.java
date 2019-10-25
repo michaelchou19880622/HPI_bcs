@@ -34,7 +34,7 @@ import com.google.gson.Gson;
 import com.hpicorp.bcs.config.Schedule;
 import com.hpicorp.bcs.schedule.job.RichMenuJob;
 import com.hpicorp.core.common.HttpClientUtil;
-import com.hpicorp.core.dto.ResponseDto;
+import com.hpicorp.core.dto.ResponseBody;
 import com.hpicorp.core.dto.RichMenuMultiple;
 import com.hpicorp.core.entities.Action;
 import com.hpicorp.core.entities.Bounds;
@@ -208,18 +208,18 @@ public class RichMenuService {
 	 */
 	public void setRichMenuByUser(String lineUserId, String richMenuId, String lineToken) {
 		Header[] headers = this.getHeaders(lineToken);
-		ResponseDto responseDTO = HttpClientUtil.postJSON(getLinkRichMenuUrl(lineUserId, richMenuId), "", headers);
-		if (responseDTO.getStatus() != 200) {
-			throw new AppException("綁定用戶 rich menu 發生錯誤" + responseDTO.getResponseBody());
+		ResponseBody body = HttpClientUtil.postJSON(getLinkRichMenuUrl(lineUserId, richMenuId), "", headers);
+		if (body.getStatus() != 200) {
+			throw new AppException("綁定用戶 rich menu 發生錯誤" + body.getData());
 		}
 	}
 	
 	public void setRichMenuMultiple(RichMenuMultiple multiple, String lineToken) {
 		Header[] headers = this.getHeaders(lineToken);
 		String body = gson.toJson(multiple);
-		ResponseDto responseDTO = HttpClientUtil.postJSON(LineApiUrl.LINK_RICH_MENU_MULTIPLE.getValue(), body, headers);
-		if (responseDTO.getStatus() != 202) {
-			throw new AppException("綁定用戶 rich menu 發生錯誤" + responseDTO.getResponseBody());
+		ResponseBody response = HttpClientUtil.postJSON(LineApiUrl.LINK_RICH_MENU_MULTIPLE.getValue(), body, headers);
+		if (response.getStatus() != 202) {
+			throw new AppException("綁定用戶 rich menu 發生錯誤" + response.getData());
 		}
 	}
 	
@@ -237,9 +237,9 @@ public class RichMenuService {
 	public void deleteLinkRichMenuByUser(String lineUserId) {
 		String lineToken = this.getLineToken();
 		Header[] headers = this.getHeaders(lineToken);
-		ResponseDto delete = HttpClientUtil.delete(getLinkRichMenuUrlByUser(lineUserId), headers);
+		ResponseBody delete = HttpClientUtil.delete(getLinkRichMenuUrlByUser(lineUserId), headers);
 		if (delete.getStatus() != 200) {
-			throw new AppException("刪除綁定 richmenu 發生錯誤, " + delete.getResponseBody());
+			throw new AppException("刪除綁定 richmenu 發生錯誤, " + delete.getData());
 		}
 	}
 	
@@ -342,11 +342,11 @@ public class RichMenuService {
 	 * @param httpEntity
 	 */
 	private String post(String url, String body, Header[] headers) {
-		ResponseDto responseDTO = HttpClientUtil.postJSON(url, body, headers);
-		if (responseDTO.getStatus() != 200) {
-			throw new AppException(responseDTO.getResponseBody());
+		ResponseBody response = HttpClientUtil.postJSON(url, body, headers);
+		if (response.getStatus() != 200) {
+			throw new AppException(response.getData());
 		}
-		return responseDTO.getResponseBody();
+		return response.getData();
 	}
 	
 	/**

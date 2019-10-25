@@ -1,6 +1,6 @@
 -- this script is for SQL Server and Azure SQL
 
-USE Richart Customer Connect;
+USE [Richart Customer Connect];
 GO
 
 IF OBJECT_ID(N'[dbo].[FK_QRTZ_TRIGGERS_QRTZ_JOB_DETAILS]', N'F') IS NOT NULL
