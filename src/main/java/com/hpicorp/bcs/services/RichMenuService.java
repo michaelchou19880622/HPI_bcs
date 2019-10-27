@@ -166,9 +166,14 @@ public class RichMenuService {
 			
 			// Step 3. 刪除掉原本的圖文選單（ Line的 ），但需要判斷是否為空，因為有可能新增多層
 			if (richMenu.getRichMenuId() != null) {
-				deleteRichMenu(richMenu.getRichMenuId());
-				RichMenuList list = richMenuListService.findByRichMenuId(richMenu.getRichMenuId());
+
+				try {
+					deleteRichMenu(richMenu.getRichMenuId());
+				} catch (Exception e) {
+					log.info("deleteRichMenu : Exception = {}", e);
+				}
 				
+				RichMenuList list = richMenuListService.findByRichMenuId(richMenu.getRichMenuId());
 				log.info("list = {}", list);
 				
 				if (list != null) {
@@ -257,12 +262,6 @@ public class RichMenuService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(AUTHORIZATION, BEARER + token);
 		HttpEntity<Object> request = new HttpEntity<>(null, headers);
-		
-//		ResponseEntity<Void> responseEntity = this.restTemplate.exchange(this.getDeleteRichMenuUrl(richMenuId), HttpMethod.DELETE, request, Void.class);
-//		
-//		if (responseEntity.getStatusCode() != HttpStatus.OK) {
-//
-//		}
 		
 		this.restTemplate.exchange(this.getDeleteRichMenuUrl(richMenuId), HttpMethod.DELETE, request, Void.class);
 	}
