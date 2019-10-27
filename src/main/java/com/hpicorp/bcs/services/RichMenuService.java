@@ -287,6 +287,7 @@ public class RichMenuService {
 	public void uploadRichMenuImage(String richMenuResponse, String imageName) throws IOException {
 		String imageUrl = this.getImageUrl(richMenuResponse);
 		byte[] imageByte = getImageByte(imageName);
+		log.info("『 Richmenu 』Image getByte Size => {}", imageByte.length);
 		this.post(imageUrl, imageByte, getExtension(imageName));
 	}
 	
@@ -454,6 +455,7 @@ public class RichMenuService {
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.getOutputStream().write(imageByte);
+			log.info("『 Richmenu 』Upload Image response code => {}, message => {}", con.getResponseCode(), con.getResponseMessage());
 		} catch (IOException e) {
 			throw new AppException("上傳圖片失敗");
 		} finally {
