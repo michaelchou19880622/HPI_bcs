@@ -26,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -170,7 +171,11 @@ public class RichMenuService {
 				try {
 					deleteRichMenu(richMenu.getRichMenuId());
 				} catch (Exception e) {
-					log.info("deleteRichMenu : Exception = {}", e);
+					if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getStatusCode() == HttpStatus.NOT_FOUND) {
+						log.info("Richmenu not found, no need to delete.");
+					} else {
+						log.info("Exception : {}", e);
+					}
 				}
 				
 				RichMenuList list = richMenuListService.findByRichMenuId(richMenu.getRichMenuId());
