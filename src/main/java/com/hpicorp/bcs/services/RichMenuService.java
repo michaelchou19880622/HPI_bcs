@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,10 @@ import com.hpicorp.core.exception.AppException;
 import com.hpicorp.core.repository.RichMenuRepository;
 import com.hpicorp.core.repository.SystemConfigRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class RichMenuService {
 
 	@Autowired
@@ -158,10 +162,15 @@ public class RichMenuService {
 			// Step 2. 上傳該圖檔，綁定該圖文選單
 			this.uploadRichMenuImage(richmenuId, richMenu.getImage());
 			
+			log.info("richMenu.getRichMenuId() = {}", richMenu.getRichMenuId());
+			
 			// Step 3. 刪除掉原本的圖文選單（ Line的 ），但需要判斷是否為空，因為有可能新增多層
 			if (richMenu.getRichMenuId() != null) {
 				deleteRichMenu(richMenu.getRichMenuId());
 				RichMenuList list = richMenuListService.findByRichMenuId(richMenu.getRichMenuId());
+				
+				log.info("list = {}", list);
+				
 				if (list != null) {
 					richMenuListService.delete(list);
 				}
@@ -248,6 +257,13 @@ public class RichMenuService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(AUTHORIZATION, BEARER + token);
 		HttpEntity<Object> request = new HttpEntity<>(null, headers);
+		
+//		ResponseEntity<Void> responseEntity = this.restTemplate.exchange(this.getDeleteRichMenuUrl(richMenuId), HttpMethod.DELETE, request, Void.class);
+//		
+//		if (responseEntity.getStatusCode() != HttpStatus.OK) {
+//
+//		}
+		
 		this.restTemplate.exchange(this.getDeleteRichMenuUrl(richMenuId), HttpMethod.DELETE, request, Void.class);
 	}
 	
