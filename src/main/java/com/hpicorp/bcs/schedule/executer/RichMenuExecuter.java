@@ -7,6 +7,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hpicorp.bcs.entities.BcsLineUser;
+import com.hpicorp.bcs.repository.BcsLineUserRepository;
 import com.hpicorp.bcs.services.RichMenuListService;
 import com.hpicorp.bcs.services.RichMenuService;
 import com.hpicorp.core.common.ListExtension;
@@ -31,6 +33,9 @@ public class RichMenuExecuter {
 
 	@Autowired
 	private LineUserRepository lineUserRepository;
+	
+	@Autowired
+	private BcsLineUserRepository bcsLineUserRepository;
 	
 	@Autowired
 	private RichMenuRepository richMenuRepository;
@@ -60,10 +65,9 @@ public class RichMenuExecuter {
 				}
 			});
 		} else if (richMenu.getGroupId() == 2) {
-			List<LineUser> lineUser = lineUserRepository.findAll();
-			List<String> list = new ArrayList<>();
-			lineUser.forEach(i -> list.add(i.getLineUid()));
-			List<List<String>> chopped = ListExtension.chopped(list, LINE_MUL);
+			List<String> bcslineUserMids = bcsLineUserRepository.findIdByBindStatus(BcsLineUser.STATUS_BINDED);
+			
+			List<List<String>> chopped = ListExtension.chopped(bcslineUserMids, LINE_MUL);
 			for (int x = 0; x < chopped.size(); x++) {
 				RichMenuMultiple rmm = new RichMenuMultiple(richMenu.getRichMenuId(), chopped.get(x));
 				this.richMenuService.setRichMenuMultiple(rmm, this.richMenuService.getLineToken());
