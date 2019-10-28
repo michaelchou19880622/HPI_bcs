@@ -32,9 +32,6 @@ public class RichMenuExecuter {
 	private RichMenuListService richMenuListService;
 
 	@Autowired
-	private LineUserRepository lineUserRepository;
-	
-	@Autowired
 	private BcsLineUserRepository bcsLineUserRepository;
 	
 	@Autowired

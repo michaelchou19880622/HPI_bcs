@@ -14,8 +14,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import com.hpicorp.bcs.config.StorageConfig;
 import com.hpicorp.bcs.storage.StorageService;
 
-@EnableJpaRepositories(basePackages = { "com.hpicorp.core.repository" })
-@EntityScan(basePackages = { "com.hpicorp.core.entities" })
+@EnableJpaRepositories(basePackages = { "com.hpicorp.core.repository", "com.hpicorp.bcs.repository" })
+@EntityScan(basePackages = { "com.hpicorp.core.entities", "com.hpicorp.bcs.entities"})
 @ComponentScan(basePackages = { "com.hpicorp.core.*", "com.hpicorp.bcs.*" })
 @SpringBootApplication
 @EnableConfigurationProperties(StorageConfig.class)
