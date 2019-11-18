@@ -113,6 +113,8 @@ public class RichMenuService {
 
 			Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
 			requestFactory.setProxy(proxy);
+			
+			log.info("createRichMenuList : proxy = {}", proxy);
 
 			restTemplate = new RestTemplate(requestFactory);
 		}
@@ -128,6 +130,8 @@ public class RichMenuService {
 			
 			HttpEntity<RichMenu> request = new HttpEntity<>(richMenu, headers);
 			log.info("createRichMenuList : request = {}", request);
+			
+			log.info("createRichMenuList : request body = {}", richMenu);
 			
 			ResponseEntity<String> response = restTemplate.postForEntity(LineApiUrl.RICH_MENU.getValue(), request, String.class);
 			log.info("createRichMenuList : response = {}", response);
@@ -185,6 +189,8 @@ public class RichMenuService {
 
 			Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
 			requestFactory.setProxy(proxy);
+
+			log.info("updateRichMenuList : proxy = {}", proxy);
 
 			restTemplate = new RestTemplate(requestFactory);
 		}
@@ -300,6 +306,8 @@ public class RichMenuService {
 
 			Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
 			requestFactory.setProxy(proxy);
+			
+			log.info("setRichMenuDefault : proxy = {}", proxy);
 
 			restTemplate = new RestTemplate(requestFactory);
 		}
@@ -335,6 +343,8 @@ public class RichMenuService {
 
 			Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
 			requestFactory.setProxy(proxy);
+			
+			log.info("deleteRichMenu : proxy = {}", proxy);
 
 			restTemplate = new RestTemplate(requestFactory);
 		}
@@ -419,6 +429,8 @@ public class RichMenuService {
 
 			Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
 			requestFactory.setProxy(proxy);
+
+			log.info("deleteAllRichMenuFromLine : proxy = {}", proxy);
 
 			restTemplate = new RestTemplate(requestFactory);
 		}
@@ -551,6 +563,8 @@ public class RichMenuService {
 		if (isUseProxy) {
 			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
 			con = (HttpURLConnection) new URL(url).openConnection(proxy);
+
+			log.info("post : proxy = {}", proxy);
 		}
 		else {
 			con = (HttpURLConnection) new URL(url).openConnection();
