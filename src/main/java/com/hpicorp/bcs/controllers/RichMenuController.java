@@ -3,6 +3,8 @@ package com.hpicorp.bcs.controllers;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -64,9 +66,18 @@ public class RichMenuController {
 	 * 創建 RichMenu 
 	 */
 	@PostMapping("/create")
-	public ResponseEntity<Object> createRichMenu(@RequestBody List<RichMenu> richMenuList) {
+	public ResponseEntity<Object> createRichMenu(@RequestBody List<RichMenu> richMenuList, HttpServletRequest req) {
 		try {
-			this.richMenuService.createRichMenuList(richMenuList);
+			log.info("req.getScheme() = {}", req.getScheme());
+			log.info("req.getServerName() = {}", req.getServerName());
+			log.info("req.getServerPort() = {}", req.getServerPort());
+			
+			
+			String originLocation = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort();
+			log.info("Origin Location = {}", originLocation);
+			
+			
+			this.richMenuService.createRichMenuList(richMenuList, originLocation);
 		} catch (Exception e) {
 			log.error("create rich menu error = {}", e);
 			return ResponseEntity.ok().body(e.getMessage());
