@@ -180,7 +180,7 @@ public class RichMenuService {
 	/**
 	 * 修改 richMenu  
 	 */
-	public void updateRichMenuList(List<RichMenu> richMenuList) throws Exception {
+	public void updateRichMenuList(List<RichMenu> richMenuList, String originLocation) throws Exception {
 
 		log.info("updateRichMenuList : isUseProxy = {}", isUseProxy);
 		
@@ -206,7 +206,7 @@ public class RichMenuService {
 			String richmenuId = response.getBody();
 			
 			// Step 2. 上傳該圖檔，綁定該圖文選單
-			this.uploadRichMenuImage(richmenuId, richMenu.getImage());
+			this.uploadRichMenuImage(richmenuId, originLocation + richMenu.getImage());
 			
 			log.info("richMenu.getRichMenuId() = {}", richMenu.getRichMenuId());
 			

@@ -89,9 +89,12 @@ public class RichMenuController {
 	 * 修改 RichMenu 
 	 */
 	@PostMapping("/update")
-	public ResponseEntity<Object> updateRichMenu(@RequestBody List<RichMenu> richMenuList) {
+	public ResponseEntity<Object> updateRichMenu(@RequestBody List<RichMenu> richMenuList, HttpServletRequest req) {
 		try {
-			this.richMenuService.updateRichMenuList(richMenuList);
+			String originLocation = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort();
+			log.info("Origin Location = {}", originLocation);
+			
+			this.richMenuService.updateRichMenuList(richMenuList, originLocation);
 		} catch (Exception e) {
 			log.error("update rich menu error = {}", e);
 			return ResponseEntity.ok().body(e.getMessage());
