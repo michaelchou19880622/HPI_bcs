@@ -25,29 +25,33 @@ public class FileUploadController {
     @PostMapping("/fileupload")
     public String handleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) throws Exception {
     	    	
-    		// 基本檢查
-	    	String newfname = StringUtils.cleanPath(file.getOriginalFilename());	
-	    	if (file.isEmpty())
-            throw new Exception("Failed to store empty file " + newfname);
+		// 基本檢查
+		String newfname = StringUtils.cleanPath(file.getOriginalFilename());
+		if (file.isEmpty())
+			throw new Exception("Failed to store empty file " + newfname);
+		
         if (newfname.contains(".."))
             throw new Exception("Cannot store file with relative path outside current directory " + newfname);
     	
-        // 開始重組新的檔名
-    		int lastIndexOfDot = newfname.lastIndexOf('.');
-    		String fileExtension = null;
-        if (lastIndexOfDot > 0) {
-            fileExtension = newfname.substring(lastIndexOfDot+1);
-        }
+		// 開始重組新的檔名
+		int lastIndexOfDot = newfname.lastIndexOf('.');
+		String fileExtension = null;
+		
+		if (lastIndexOfDot > 0) {
+			fileExtension = newfname.substring(lastIndexOfDot + 1);
+		}
+		
         newfname = UUID.randomUUID().toString() + "." + fileExtension; 
         
-        // 開始上傳圖片
-        try {
-        		newfname = azureCDNService.uploadFile(file, newfname);
+		// 開始上傳圖片
+		try {
+			newfname = azureCDNService.uploadFile(file, newfname);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        return "success:" + newfname;
-    }
+		
+		return "success:" + newfname;
+	}
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Void> handleStorageFileNotFound(Exception exc) {

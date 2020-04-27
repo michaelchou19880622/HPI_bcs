@@ -406,7 +406,7 @@ CREATE TABLE [Richart Customer Connect].dbo.bounds (
 
 CREATE TABLE [Richart Customer Connect].dbo.richmenu (
 	id bigint NOT NULL,
-	chat_bar_text varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	chat_bar_text nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	create_time varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	custom_id bigint NULL,
 	group_id bigint NULL,
@@ -414,7 +414,7 @@ CREATE TABLE [Richart Customer Connect].dbo.richmenu (
 	key_id varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[level] varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	modify_time datetime NULL,
-	name varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	richmenu_id varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	selected varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	start_date datetime NULL,
@@ -446,7 +446,7 @@ CREATE TABLE [Richart Customer Connect].dbo.richmenu_list (
 	create_time datetime NULL,
 	custom_id bigint NULL,
 	modify_time datetime NULL,
-	name varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	richmenu_id varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CONSTRAINT PK__richmenu__3213E83F2C8822B1 PRIMARY KEY (id)
 ) GO;

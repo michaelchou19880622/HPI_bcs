@@ -114,13 +114,40 @@ public class Schedule {
 	 * @throws Exception 
 	 */
 	public void addSchedule(JobDetail jobDetail, Trigger trigger, String detailName) throws Exception {
+
+		log.info("jobDetail.getKey().getName() = {}, length = {}", jobDetail.getKey().getName(), jobDetail.getKey().getName().length());
+		log.info("jobDetail.getKey().getGroup() = {}, length = {}", jobDetail.getKey().getGroup(), jobDetail.getKey().getGroup().length());
+
+		for (String key : jobDetail.getJobDataMap().keySet()) {
+			log.info("key = {}, jobDetail.getJobDataMap().get({}) = {}", key, key, jobDetail.getJobDataMap().get(key));
+		}
+		
+		log.info("trigger.getKey().getName() = {}, length = {}", trigger.getKey().getName(), trigger.getKey().getName().length());
+		log.info("trigger.getKey().getGroup() = {}, length = {}", trigger.getKey().getGroup(), trigger.getKey().getGroup().length());
+
+		for (String key : trigger.getJobDataMap().keySet()) {
+			log.info("key = {}, trigger.getJobDataMap().get({}) = {}", key, key, trigger.getJobDataMap().get(key));
+		}
+		
+		log.info("detailName = {}, length = {}", detailName, detailName.length());
+		
 		try {
 			synchronized (SCHEDULE_FLAG) {
+
+				if (scheduler.checkExists(jobDetail.getKey())) {
+
+					log.info("『 Schedule add 』jobDetail.getKey() => {}, Job is already exist, delete it first.", jobDetail.getKey());
+					boolean isJobDeleted = scheduler.deleteJob(jobDetail.getKey());
+
+					log.info("『 Schedule add 』isJobDeleted = {}", isJobDeleted);
+				}
+
 				Date result = scheduler.scheduleJob(jobDetail, trigger);
+
 				log.info("『 Schedule add 』result => {}, detailName => {}", result, detailName);
 			}
 		} catch (Exception e) {
-			log.error("『 Schedule add 』error => {}", e);
+			log.info("『 Schedule add 』error => {}", e);
 			throw new Exception("add schedule error => " + e);
 		}
 	}

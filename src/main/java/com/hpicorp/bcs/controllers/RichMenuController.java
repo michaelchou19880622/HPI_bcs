@@ -2,10 +2,14 @@ package com.hpicorp.bcs.controllers;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,9 +19,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.hpicorp.bcs.services.RichMenuService;
 import com.hpicorp.core.entities.RichMenu;
+import com.hpicorp.core.entities.RichMenuList;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,18 +41,39 @@ public class RichMenuController {
 	 */
 	@GetMapping("/list")
 	public ResponseEntity<Object> getRichMenuList() {
-		Object obj;
+		
+		List<Map<String, Object>> listMapObject;
+		
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.add(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
+	    
 		try {
-			obj = this.richMenuService.getRichMenuList();
+//			List<Object> listObj = this.richMenuService.getRichMenuDtoList();
+			listMapObject = this.richMenuService.findRichmenuListByLevel();
+			
+			for (Map<String, Object> mapObject : listMapObject) {
+				log.info("mapObject = {}", mapObject);
+				
+//				RichmenuListDto richmenuListDto = new RichmenuListDto();
+//				richmenuListDto.setId((Long)object[0]);
+			}
+			
 		} catch (Exception e) {
 			log.error("get rich menu list error = {}", e.getMessage());
-			return ResponseEntity.ok().body(e.getMessage());
+			
+			return ResponseEntity.ok()
+								 .headers(headers)
+								 .body(e.getMessage());
 		}
-		return ResponseEntity.ok().body(obj);
+		return ResponseEntity.ok()
+							 .headers(headers)
+							 .body(listMapObject);
 	}
-	
+
 	@PostMapping("/list/id")
 	public ResponseEntity<Object> getRichMenuListById(@RequestBody RichMenu richMenu) {
+		log.info("richMenu = {}", richMenu);
+		
 		Object obj;
 		try {
 			obj = this.richMenuService.getRichMenuListById(richMenu);
@@ -66,16 +93,16 @@ public class RichMenuController {
 	 * 創建 RichMenu 
 	 */
 	@PostMapping("/create")
-	public ResponseEntity<Object> createRichMenu(@RequestBody List<RichMenu> richMenuList, HttpServletRequest req) {
+	public ResponseEntity<Object> createRichMenu(@RequestBody List<RichMenu> richMenuList, HttpServletRequest req ) {
+		log.info("richMenuList = {}", richMenuList);
+		
 		try {
 			log.info("req.getScheme() = {}", req.getScheme());
 			log.info("req.getServerName() = {}", req.getServerName());
 			log.info("req.getServerPort() = {}", req.getServerPort());
 			
-			
 			String originLocation = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort();
 			log.info("Origin Location = {}", originLocation);
-			
 			
 			this.richMenuService.createRichMenuList(richMenuList, originLocation);
 		} catch (Exception e) {
@@ -90,7 +117,13 @@ public class RichMenuController {
 	 */
 	@PostMapping("/update")
 	public ResponseEntity<Object> updateRichMenu(@RequestBody List<RichMenu> richMenuList, HttpServletRequest req) {
+		log.info("richMenuList = {}", richMenuList);
+		
 		try {
+			log.info("req.getScheme() = {}", req.getScheme());
+			log.info("req.getServerName() = {}", req.getServerName());
+			log.info("req.getServerPort() = {}", req.getServerPort());
+			
 			String originLocation = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort();
 			log.info("Origin Location = {}", originLocation);
 			
@@ -104,7 +137,7 @@ public class RichMenuController {
 	
 	/**
 	 * 綁定 用戶 與 RichMenu 
-	 */
+	 
 	@PostMapping("/link/{lineUserId}/{richMenuId}")
 	public ResponseEntity<Object> getRichMenuIdByUser(
 			@PathVariable("lineUserId") String lineUserId, @PathVariable("richMenuId") String richMenuId) {
@@ -137,7 +170,7 @@ public class RichMenuController {
 			this.richMenuService.deleteRichMenu(richMenu);
 		} catch (Exception e) {
 			log.error("delete richmenu error => {}", e.getMessage());
-			return ResponseEntity.ok().body(e.getMessage());			
+			return ResponseEntity.ok().body(e.getMessage());
 		}
 		return ResponseEntity.ok().body("刪除圖文選單成功");
 	}

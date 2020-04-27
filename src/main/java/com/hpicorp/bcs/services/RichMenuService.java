@@ -4,17 +4,26 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -43,6 +52,7 @@ import com.hpicorp.core.common.HttpClientUtil;
 import com.hpicorp.core.dto.ResponseBody;
 import com.hpicorp.core.dto.RichMenuMultiple;
 import com.hpicorp.core.entities.Action;
+import com.hpicorp.core.entities.BcsSystemConfig;
 import com.hpicorp.core.entities.Bounds;
 import com.hpicorp.core.entities.RichMenu;
 import com.hpicorp.core.entities.RichMenuAreas;
@@ -52,6 +62,7 @@ import com.hpicorp.core.entities.SystemConfig;
 import com.hpicorp.core.enums.LineApiUrl;
 import com.hpicorp.core.enums.ScheduleType;
 import com.hpicorp.core.exception.AppException;
+import com.hpicorp.core.repository.BcsSystemConfigRepository;
 import com.hpicorp.core.repository.RichMenuRepository;
 import com.hpicorp.core.repository.SystemConfigRepository;
 
@@ -64,10 +75,16 @@ public class RichMenuService {
 	@Autowired
 	private SystemConfigRepository systemConfigRepository;
 	
+	@Autowired
+	private BcsSystemConfigRepository bcsSystemConfigRepository;
+	
 	private Gson gson = new Gson();
 	
 	private static final String BEARER = "Bearer ";
 	private static final String AUTHORIZATION = "Authorization";
+	
+	@Value("${bcs.system.configId}")
+	private String bcsSystemConfigId;
 
 	@Value("${line.config.key}")
 	private String lineConfigKey;
@@ -93,10 +110,17 @@ public class RichMenuService {
 	/**
 	 * 取得 richMenu list  
 	 */
-	public Object getRichMenuList() {
+	public List<Object[]> getRichMenuList() {
 		return this.richMenuRepository.findByLevel();
 	}
-
+	
+	/**
+	 * 取得 richMenu list  
+	 */
+	public List<Map<String, Object>> findRichmenuListByLevel() {
+		return this.richMenuRepository.findRichmenuListByLevel();
+	}
+	
 	public Object getRichMenuListById(RichMenu richMenu) {
 		return this.richMenuRepository.findByChatBarText(richMenu.getChatBarText());
 	}
@@ -106,7 +130,7 @@ public class RichMenuService {
 	 */
 	public void createRichMenuList(List<RichMenu> richMenuList, String originLocation) throws Exception {
 
-		log.info("createRichMenuList : isUseProxy = {}", isUseProxy);
+		log.info("『 createRichMenuList 』: isUseProxy = {}", isUseProxy);
 		
 		if (isUseProxy) {
 			SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
@@ -114,32 +138,33 @@ public class RichMenuService {
 			Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
 			requestFactory.setProxy(proxy);
 			
-			log.info("createRichMenuList : proxy = {}", proxy);
+			log.info("『 createRichMenuList 』: proxy = {}", proxy);
 
 			restTemplate = new RestTemplate(requestFactory);
 		}
 
-		log.info("createRichMenuList : restTemplate = {}", restTemplate);
+		log.info("『 createRichMenuList 』: restTemplate = {}", restTemplate);
 		
 		for (RichMenu richMenu : richMenuList) {
 			// Step 1. 呼叫 Line Api 保存該圖文選單內容
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-			headers.set(AUTHORIZATION, BEARER + this.getLineToken());
-			log.info("createRichMenuList : headers = {}", headers);
+//			headers.set(AUTHORIZATION, BEARER + this.getLineToken());
+			headers.set(AUTHORIZATION, BEARER + this.getLineTokenFromBcsSystemConfig());
+			log.info("『 createRichMenuList 』: headers = {}", headers);
 			
 			HttpEntity<RichMenu> request = new HttpEntity<>(richMenu, headers);
-			log.info("createRichMenuList : request = {}", request);
+			log.info("『 createRichMenuList 』: request = {}", request);
 			
-			log.info("createRichMenuList : request body = {}", richMenu);
+			log.info("『 createRichMenuList 』: request body = {}", richMenu);
 			
 			ResponseEntity<String> response = restTemplate.postForEntity(LineApiUrl.RICH_MENU.getValue(), request, String.class);
-			log.info("createRichMenuList : response = {}", response);
+			log.info("『 createRichMenuList 』: response = {}", response);
 			
 			String richmenuId = response.getBody();
-			log.info("createRichMenuList : richmenuId = {}", richmenuId);
+			log.info("『 createRichMenuList 』: richmenuId = {}", richmenuId);
 			
-			log.info("createRichMenuList : richMenu.getImage() = {}", richMenu.getImage());
+			log.info("『 createRichMenuList 』: richMenu.getImage() = {}", richMenu.getImage());
 			
 			// Step 2. 上傳該圖檔，綁定該圖文選單
 			this.uploadRichMenuImage(richmenuId, originLocation + richMenu.getImage());
@@ -149,15 +174,31 @@ public class RichMenuService {
 			size.setRichmenu(richMenu);
 			richMenu.setSize(size);
 			List<RichMenuAreas> areasList = richMenu.getAreas();
+			
+//			for (RichMenuAreas richMenuAreas : areasList) {
+//				richMenuAreas.setRichmenu(richMenu);
+//				
+//				Action action = richMenuAreas.getAction();
+//				action.setRichmenuAreas(richMenuAreas);
+//				richMenuAreas.setAction(action);
+//				
+//				Bounds bounds = richMenuAreas.getBounds();
+//				bounds.setRichmenuAreas(richMenuAreas);
+//				richMenuAreas.setBounds(bounds);
+//			}
+			
 			areasList.forEach(i -> {
 				i.setRichmenu(richMenu);
+				
 				Action action = i.getAction();
 				action.setRichmenuAreas(i);
 				i.setAction(action);
+				
 				Bounds bounds = i.getBounds();
 				bounds.setRichmenuAreas(i);
 				i.setBounds(bounds);
 			});
+			
 			richMenu.setAreas(areasList);
 			richMenu.setRichMenuId(this.getRichMenuId(richmenuId));
 			richMenu.setModifyTime(new Date());
@@ -182,7 +223,7 @@ public class RichMenuService {
 	 */
 	public void updateRichMenuList(List<RichMenu> richMenuList, String originLocation) throws Exception {
 
-		log.info("updateRichMenuList : isUseProxy = {}", isUseProxy);
+		log.info("『 updateRichMenuList 』: isUseProxy = {}", isUseProxy);
 		
 		if (isUseProxy) {
 			SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
@@ -190,7 +231,7 @@ public class RichMenuService {
 			Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
 			requestFactory.setProxy(proxy);
 
-			log.info("updateRichMenuList : proxy = {}", proxy);
+			log.info("『 updateRichMenuList 』: proxy = {}", proxy);
 
 			restTemplate = new RestTemplate(requestFactory);
 		}
@@ -199,7 +240,9 @@ public class RichMenuService {
 			// Step 1. 呼叫 Line Api 保存該圖文選單內容
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-			headers.set(AUTHORIZATION, BEARER + this.getLineToken());
+//			headers.set(AUTHORIZATION, BEARER + this.getLineToken());
+			headers.set(AUTHORIZATION, BEARER + this.getLineTokenFromBcsSystemConfig());
+			
 			HttpEntity<RichMenu> request = new HttpEntity<>(richMenu, headers);
 			
 			ResponseEntity<String> response = restTemplate.postForEntity(LineApiUrl.RICH_MENU.getValue(), request, String.class);
@@ -208,7 +251,7 @@ public class RichMenuService {
 			// Step 2. 上傳該圖檔，綁定該圖文選單
 			this.uploadRichMenuImage(richmenuId, originLocation + richMenu.getImage());
 			
-			log.info("richMenu.getRichMenuId() = {}", richMenu.getRichMenuId());
+			log.info("『 updateRichMenuList 』: richMenu.getRichMenuId() = {}", richMenu.getRichMenuId());
 			
 			// Step 3. 刪除掉原本的圖文選單（ Line的 ），但需要判斷是否為空，因為有可能新增多層
 			if (richMenu.getRichMenuId() != null) {
@@ -224,7 +267,7 @@ public class RichMenuService {
 				}
 				
 				RichMenuList list = richMenuListService.findByRichMenuId(richMenu.getRichMenuId());
-				log.info("list = {}", list);
+				log.info("『 updateRichMenuList 』: list = {}", list);
 				
 				if (list != null) {
 					richMenuListService.delete(list);
@@ -262,44 +305,64 @@ public class RichMenuService {
 			if (richMenu.getLevel().equals("1")) {
 				addScheduleDate(richMenu);
 			}
-			
 		}
-		
 	}
 	
 	/**
 	 * 設置 用戶 綁定 richmenu 
 	 */
 	public void setRichMenuByUser(String lineUserId, String richMenuId, String lineToken) {
+		log.info("『 setRichMenuByUser 』 : lineUserId = {}", lineUserId);
+		log.info("『 setRichMenuByUser 』 : richMenuId = {}", richMenuId);
+		log.info("『 setRichMenuByUser 』 : lineToken = {}", lineToken);
+		
 		Header[] headers = this.getHeaders(lineToken);
+		log.info("『 setRichMenuByUser 』 : headers = {}", (Object)headers);
 		
-		log.info("setRichMenuByUser : isUseProxy = {}", isUseProxy);
+		log.info("『 setRichMenuByUser 』 : isUseProxy = {}", isUseProxy);
 		
-		ResponseBody body = HttpClientUtil.postJSON(getLinkRichMenuUrl(lineUserId, richMenuId), "", headers, isUseProxy);
-		if (body.getStatus() != 200) {
-			throw new AppException("綁定用戶 rich menu 發生錯誤" + body.getData());
+		ResponseBody responseBody = HttpClientUtil.postJSON(getLinkRichMenuUrl(lineUserId, richMenuId), "", headers, isUseProxy);
+		log.info("『 setRichMenuByUser 』 : responseBody = {}", responseBody);
+		
+		if (responseBody.getStatus() != 200) {
+			throw new AppException("綁定用戶 rich menu 發生錯誤" + responseBody.getData());
 		}
 	}
 	
-	public void setRichMenuMultiple(RichMenuMultiple multiple, String lineToken) {
+	public boolean setRichMenuMultiple(RichMenuMultiple multiple, String lineToken) {
+		log.info("『 setRichMenuMultiple 』 : multiple = {}", multiple);
+		log.info("『 setRichMenuMultiple 』 : lineToken = {}", lineToken);
+		
 		Header[] headers = this.getHeaders(lineToken);
-		String body = gson.toJson(multiple);
+		log.info("『 setRichMenuMultiple 』 : headers = {}", (Object)headers);
 		
-		log.info("setRichMenuMultiple : isUseProxy = {}", isUseProxy);
+		String requestBody = gson.toJson(multiple);
+		log.info("『 setRichMenuMultiple 』 : requestBody = {}", requestBody);
 		
-		ResponseBody response = HttpClientUtil.postJSON(LineApiUrl.LINK_RICH_MENU_MULTIPLE.getValue(), body, headers, isUseProxy);
-		if (response.getStatus() != 202) {
-			throw new AppException("綁定用戶 rich menu 發生錯誤" + response.getData());
+		log.info("『 setRichMenuMultiple 』 : isUseProxy = {}", isUseProxy);
+		
+		ResponseBody responseBody = HttpClientUtil.postJSON(LineApiUrl.LINK_RICH_MENU_MULTIPLE.getValue(), requestBody, headers, isUseProxy);
+		log.info("『 setRichMenuByUser 』 : responseBody = {}", responseBody);
+		
+		if (responseBody.getStatus() != 202) {
+			log.info("『 setRichMenuMultiple 』 : 綁定用戶 rich menu 發生錯誤 : " + responseBody.getData());
+			return false;
 		}
+
+		return true;
 	}
 	
 	public void setRichMenuDefault(String richmenuId) {
+		log.info("『 setRichMenuDefault 』 : richmenuId = {}", richmenuId);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-		headers.set(AUTHORIZATION, BEARER + this.getLineToken());
+//		headers.set(AUTHORIZATION, BEARER + this.getLineToken());
+		headers.set(AUTHORIZATION, BEARER + this.getLineTokenFromBcsSystemConfig());
+		log.info("『 setRichMenuDefault 』 : headers = {}", headers);
+		
 		HttpEntity<Object> request = new HttpEntity<>(headers);
 
-		log.info("setRichMenuDefault : isUseProxy = {}", isUseProxy);
+		log.info("『 setRichMenuDefault 』 : isUseProxy = {}", isUseProxy);
 		
 		if (isUseProxy) {
 			SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
@@ -307,7 +370,7 @@ public class RichMenuService {
 			Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
 			requestFactory.setProxy(proxy);
 			
-			log.info("setRichMenuDefault : proxy = {}", proxy);
+			log.info("『 setRichMenuDefault 』 : proxy = {}", proxy);
 
 			restTemplate = new RestTemplate(requestFactory);
 		}
@@ -319,46 +382,85 @@ public class RichMenuService {
 	 * 刪除 綁定 richMenu  
 	 */
 	public void deleteLinkRichMenuByUser(String lineUserId) {
-		String lineToken = this.getLineToken();
+		log.info("『 deleteLinkRichMenuByUser 』: lineUserId = {}", lineUserId);
+		
+//		String lineToken = this.getLineToken();
+		String lineToken = this.getLineTokenFromBcsSystemConfig();
+		log.info("『 deleteLinkRichMenuByUser 』: lineToken = {}", lineToken);
+		
 		Header[] headers = this.getHeaders(lineToken);
+		log.info("『 deleteLinkRichMenuByUser 』: headers = {}", (Object)headers);
 		
-		log.info("deleteLinkRichMenuByUser : isUseProxy = {}", isUseProxy);
-		
+		log.info("『 deleteLinkRichMenuByUser 』: isUseProxy = {}", isUseProxy);
 		ResponseBody delete = HttpClientUtil.delete(getLinkRichMenuUrlByUser(lineUserId), headers, isUseProxy);
+		log.info("『 deleteLinkRichMenuByUser 』: delete.getData() = {}", delete.getData());
+		log.info("『 deleteLinkRichMenuByUser 』: delete.getStatus() = {}", delete.getStatus());
+		
 		if (delete.getStatus() != 200) {
 			throw new AppException("刪除綁定 richmenu 發生錯誤, " + delete.getData());
 		}
 	}
 	
 	public void deleteRichMenu(String richMenuId) {
-		String token = this.getLineToken();
+		log.info("『 deleteRichMenu 』: richMenuId = {}", richMenuId);
+		
+//		String token = this.getLineToken();
+		String token = this.getLineTokenFromBcsSystemConfig();
+		log.info("『 deleteRichMenu 』: token = {}", token);
+		
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(AUTHORIZATION, BEARER + token);
-		HttpEntity<Object> request = new HttpEntity<>(null, headers);
-
-		log.info("deleteRichMenu : isUseProxy = {}", isUseProxy);
+		log.info("『 deleteRichMenu 』: headers = {}", headers);
 		
+		HttpEntity<Object> request = new HttpEntity<>(null, headers);
+		
+		log.info("『 deleteRichMenu 』: isUseProxy = {}", isUseProxy);
 		if (isUseProxy) {
 			SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 
 			Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
 			requestFactory.setProxy(proxy);
 			
-			log.info("deleteRichMenu : proxy = {}", proxy);
+			log.info("『 deleteRichMenu 』: proxy = {}", proxy);
 
 			restTemplate = new RestTemplate(requestFactory);
 		}
 		
-	    restTemplate.exchange(this.getDeleteRichMenuUrl(richMenuId), HttpMethod.DELETE, request, Void.class);
+		try {
+			ResponseEntity<Void> responseEntity = restTemplate.exchange(this.getDeleteRichMenuUrl(richMenuId), HttpMethod.DELETE, request, Void.class);
+
+		    if (responseEntity.getBody() != null) {
+			    log.info("『 deleteRichMenu 』: responseEntity.getBody().toString() = {}", responseEntity.getBody().toString());
+		    }
+
+			log.info("『 deleteRichMenu 』: responseEntity.getStatusCode() = {}", responseEntity.getStatusCode());
+		
+		} catch (Exception e) {
+			if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getStatusCode() == HttpStatus.NOT_FOUND) {
+				log.info("『 deleteRichMenu 』: Richmenu not found or already deleted by other way, no need to ask LINE to delete it again.");
+			} else {
+				log.error("『 deleteRichMenu 』: Exception => {}", e);
+				throw e;
+			}
+		}
 	}
 	
 	/**
 	 * 上傳 richmenu 的設定資訊
 	 */
 	public String createRichMenuDetail(RichMenu richMenu) {
-		String token = this.getLineToken();
+		log.info("『 createRichMenuDetail 』: richMenu = {}", richMenu);
+		
+//		String token = this.getLineToken();
+		String token = this.getLineTokenFromBcsSystemConfig();
+		log.info("『 createRichMenuDetail 』: token = {}", token);
+		
 		Header[] headers = this.getHeaders(token);
+		log.info("『 createRichMenuDetail 』: headers = {}", (Object)headers);
+		
 		String body = gson.toJson(richMenu);
+		log.info("『 createRichMenuDetail 』: body = {}", body);
+		
 		return this.post(LineApiUrl.RICH_MENU.getValue(), body, headers);
 	}
 	
@@ -366,14 +468,15 @@ public class RichMenuService {
 	 * 上傳 richmenu 的圖片檔 
 	 */
 	public void uploadRichMenuImage(String richMenuResponse, String imageName) throws IOException {
-		log.info("『 Richmenu 』richMenuResponse => {}", richMenuResponse);
-		log.info("『 Richmenu 』imageName => {}", imageName);
+		log.info("『 uploadRichMenuImage 』richMenuResponse => {}", richMenuResponse);
+		log.info("『 uploadRichMenuImage 』imageName => {}", imageName);
 		
 		String imageUrl = this.getImageUrl(richMenuResponse);
-		log.info("『 Richmenu 』imageUrl => {}", imageUrl);
+		log.info("『 uploadRichMenuImage 』imageUrl => {}", imageUrl);
 		
 		byte[] imageByte = getImageByte(imageName);
-		log.info("『 Richmenu 』Image getByte Size => {}", imageByte.length);
+		log.info("『 uploadRichMenuImage 』Image getByte Size => {}", imageByte.length);
+		
 		this.post(imageUrl, imageByte, getExtension(imageName));
 	}
 	
@@ -387,6 +490,19 @@ public class RichMenuService {
 			throw new AppException("該 Config key 不存在");
 		}
 		return systemConfig.get().getConfigValue();
+	}
+	
+	/**
+	 * 取得 Line 的 Token
+	 * @return
+	 */
+	public String getLineTokenFromBcsSystemConfig() {
+		Optional<BcsSystemConfig> bcsSystemConfig = this.bcsSystemConfigRepository.findByConfigId(bcsSystemConfigId);
+		if (!bcsSystemConfig.isPresent()) {
+			throw new AppException("該 Config key 不存在");
+		}
+		
+		return bcsSystemConfig.get().getValue();
 	}
 	
 	/**
@@ -417,12 +533,19 @@ public class RichMenuService {
 	 * @throws IOException
 	 */
 	public void deleteAllRichMenuFromLine() throws IOException {
-		String token = this.getLineToken();
+		log.info("『 deleteAllRichMenuFromLine 』");
+		
+//		String token = this.getLineToken();
+		String token = this.getLineTokenFromBcsSystemConfig();
+		log.info("『 deleteAllRichMenuFromLine 』: token = {}", token);
+		
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(AUTHORIZATION, BEARER + token);
+		log.info("『 deleteAllRichMenuFromLine 』: headers = {}", headers);
+		
 		HttpEntity<Object> request = new HttpEntity<>(null, headers);
 
-		log.info("deleteAllRichMenuFromLine : isUseProxy = {}", isUseProxy);
+		log.info("『 deleteAllRichMenuFromLine 』: isUseProxy = {}", isUseProxy);
 		
 		if (isUseProxy) {
 			SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
@@ -430,7 +553,7 @@ public class RichMenuService {
 			Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
 			requestFactory.setProxy(proxy);
 
-			log.info("deleteAllRichMenuFromLine : proxy = {}", proxy);
+			log.info("『 deleteAllRichMenuFromLine 』: proxy = {}", proxy);
 
 			restTemplate = new RestTemplate(requestFactory);
 		}
@@ -463,8 +586,7 @@ public class RichMenuService {
 	 * @param httpEntity
 	 */
 	private String post(String url, String body, Header[] headers) {
-		
-		log.info("post : isUseProxy = {}", isUseProxy);
+		log.info("『 post 』: isUseProxy = {}", isUseProxy);
 		
 		ResponseBody response = HttpClientUtil.postJSON(url, body, headers, isUseProxy);
 		if (response.getStatus() != 200) {
@@ -495,7 +617,6 @@ public class RichMenuService {
 		InputStream is = null;
 		try {
 			is = new URL(filePath).openStream();
-			
 			log.info("getImageByte : is = {}", is);
 			
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -508,9 +629,11 @@ public class RichMenuService {
 			bos.close();
 			buffer = bos.toByteArray();
 		} catch (FileNotFoundException e) {
+			log.info("FileNotFoundException : e = {}", e);
 			e.printStackTrace();
 			throw e;
 		} catch (IOException e) {
+			log.info("IOException : e = {}", e);
 			e.printStackTrace();
 			throw e;
 		} finally {
@@ -538,7 +661,8 @@ public class RichMenuService {
 	 * 取得上傳圖片的路徑 
 	 */
 	private String getImageUrl(String richMenuId) {
-		return LineApiUrl.RICH_MENU.getValue() + getRichMenuId(richMenuId) + "/content";
+//		return LineApiUrl.RICH_MENU.getValue() + getRichMenuId(richMenuId) + "/content";
+		return LineApiUrl.RICH_MENU_UPLOAD_RICHMENU_IMAGE.getValue() + getRichMenuId(richMenuId) + "/content";
 	}
 	
 	/**
@@ -552,33 +676,62 @@ public class RichMenuService {
 	/**
 	 * 送出 http post，上傳圖片 
 	 * @throws IOException 
+	 * @throws KeyManagementException 
+	 * @throws NoSuchAlgorithmException 
 	 * @throws MalformedURLException 
 	 */
 	private void post(String url, byte[] imageByte, String contentType) throws IOException {
+		HttpsURLConnection con = null;
 		
-		HttpURLConnection con = null;
+		SSLContext sslContext = null;
+		
+		try {
+			sslContext = SSLContext.getInstance("TLSv1.2");
+	
+			// set up a TrustManager that trusts everything
+			sslContext.init(null, new TrustManager[] { new X509TrustManager() {
+				public X509Certificate[] getAcceptedIssuers() {
+					log.info("getAcceptedIssuers => {}", Calendar.getInstance().getTime());
+					return null;
+				}
+				
+				public void checkClientTrusted(X509Certificate[] certs, String authType) {
+					log.info("checkClientTrusted => {}", Calendar.getInstance().getTime());
+				}
+				
+				public void checkServerTrusted(X509Certificate[] certs, String authType) {
+					log.info("checkServerTrusted => {}", Calendar.getInstance().getTime());
+				}
+			} }, new SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+		} catch (Exception e) {
+			log.info("『 post 』: Exception = {}", e);
+		}
+		
 
-		log.info("post : isUseProxy = {}", isUseProxy);
-		
+		log.info("『 post 』: isUseProxy = {}", isUseProxy);
 		if (isUseProxy) {
 			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(LineApiUrl.PROXY_URL.getValue(), LineApiUrl.PROXY_PORT.getIntValue()));
-			con = (HttpURLConnection) new URL(url).openConnection(proxy);
+			con = (HttpsURLConnection) new URL(url).openConnection(proxy);
 
-			log.info("post : proxy = {}", proxy);
+			log.info("『 post 』: proxy = {}", proxy);
 		}
 		else {
-			con = (HttpURLConnection) new URL(url).openConnection();
+			con = (HttpsURLConnection) new URL(url).openConnection();
 		}
+		
+		con.setSSLSocketFactory(sslContext.getSocketFactory());
 		
 		try {
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Content-Type", contentType);
-			con.setRequestProperty("Authorization", BEARER + this.getLineToken());
+			con.setRequestProperty("Authorization", BEARER + this.getLineTokenFromBcsSystemConfig());
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.getOutputStream().write(imageByte);
 			log.info("『 Richmenu 』Upload Image response code => {}, message => {}", con.getResponseCode(), con.getResponseMessage());
 		} catch (IOException e) {
+			log.info("『 post 』: IOException = {}", e);
 			throw new AppException("上傳圖片失敗");
 		} finally {
 			con.disconnect();
@@ -612,11 +765,25 @@ public class RichMenuService {
 	 * @throws Exception
 	 */
 	private void addScheduleDate(RichMenu richMenu) throws Exception {
+		log.info("『 addScheduleDate 』: richMenu = {}", richMenu);
+		log.info("『 addScheduleDate 』: richMenu.getClass().getSimpleName() = {}", richMenu.getClass().getSimpleName());
+		log.info("『 addScheduleDate 』: richMenu.getId() = {}", richMenu.getId());
+		
 		String detailName = RichMenu.class.getSimpleName() + "-" + richMenu.getId();
+		log.info("『 addScheduleDate 』: detailName = {}", detailName);
+		
 		Map<String, Object> jobDataAsMap = new HashMap<>();
 		jobDataAsMap.put("richMenu", richMenu);
+		log.info("『 addScheduleDate 』: jobDataAsMap = {}", jobDataAsMap);
+		
 		JobDetail jobDetail = this.schedule.createJobDetail(new RichMenuJob(), detailName, ScheduleType.RICH_MENU_GROUP.getValue(), jobDataAsMap);
+		log.info("『 addScheduleDate 』: jobDetail = {}", jobDetail);
+
+		log.info("『 addScheduleDate 』: richMenu.getStartDate() = {}", richMenu.getStartDate());
+		
 		Trigger trigger = this.schedule.createSimpleTrigger(richMenu.getStartDate(), jobDetail);
+		log.info("『 addScheduleDate 』: trigger = {}", trigger);
+		
 		this.schedule.addSchedule(jobDetail, trigger, detailName);
 	}
 
