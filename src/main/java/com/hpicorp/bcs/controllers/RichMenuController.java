@@ -48,15 +48,7 @@ public class RichMenuController {
 	    headers.add(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
 	    
 		try {
-//			List<Object> listObj = this.richMenuService.getRichMenuDtoList();
 			listMapObject = this.richMenuService.findRichmenuListByLevel();
-			
-			for (Map<String, Object> mapObject : listMapObject) {
-				log.info("mapObject = {}", mapObject);
-				
-//				RichmenuListDto richmenuListDto = new RichmenuListDto();
-//				richmenuListDto.setId((Long)object[0]);
-			}
 			
 		} catch (Exception e) {
 			log.error("get rich menu list error = {}", e.getMessage());

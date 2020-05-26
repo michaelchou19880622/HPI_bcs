@@ -59,6 +59,7 @@ public class RichMenuExecuter {
 
 	private static final Integer LINE_MUL = 150;
 
+	@SuppressWarnings("unchecked")
 	public void execute(RichMenu richMenu) {
 
 		// Step 1: 取得 groupId
@@ -70,7 +71,9 @@ public class RichMenuExecuter {
 		log.info("『 RichMenuExecuter execute 』: groupType = {}", groupType);
 
 		// Step 3: 依照groupType 去取得對應的 UID list
-		if (!BcsSendGroup.GROUP_TYPE_UID_LIST.equals(groupType) && !BcsSendGroup.GROUP_TYPE_CONDITIONS.equals(groupType)) {
+		if (!BcsSendGroup.GROUP_TYPE_UID_LIST.equals(groupType) 
+				&& !BcsSendGroup.GROUP_TYPE_CONDITIONS.equals(groupType)
+				&& !BcsSendGroup.GROUP_TYPE_BINDSTATUS.equals(groupType)) {
 
 			// groupType 不符合圖文選單群組類型，提示錯誤。
 			log.info("『 RichMenuExecuter execute 』 : GroupType is not matching to the type of Richmenu SendGroup!");
@@ -80,14 +83,32 @@ public class RichMenuExecuter {
 		
 		// Step 4: 針對篩選出的uid 進行更新圖文選單
 		List<BcsSendGroupDetail> list_bcsSendGroupDetails = bcsSendGroupDetailRepository.findBySendGroupGroupId(richmenuGroupId);
-		log.info("『 RichMenuExecuter execute 』: list_bcsSendGroupDetails = {}", list_bcsSendGroupDetails);
-
+		log.info("『 RichMenuExecuter execute 』: list_bcsSendGroupDetails.size() = {}", list_bcsSendGroupDetails.size());
+		
 		try {
-			Query query = buildFindQuery(list_bcsSendGroupDetails, "DISTINCT MID");
-			log.info("『 RichMenuExecuter execute 』: query = {}", query);
+			List<String> list_Uids = new ArrayList<String>();
 			
-			@SuppressWarnings("unchecked")
-			List<String> list_Uids = query.getResultList();
+			if (groupType.equals(BcsSendGroup.GROUP_TYPE_BINDSTATUS)) {
+				String status = list_bcsSendGroupDetails.get(0).getQueryValue();
+				log.info("『 RichMenuExecuter execute 』: status = {}", status);
+				
+				switch (status) {
+					case BcsSendGroup.BINDSTATUS_BINDED:
+					case BcsSendGroup.BINDSTATUS_UNBIND:
+						list_Uids = bcsLineUserRepository.findIdByStatus(status);
+						break;
+					case BcsSendGroup.BINDSTATUS_ALL:
+						list_Uids = bcsLineUserRepository.findIdByStatusAll();
+						break;
+				}
+			}
+			else {
+				Query query = buildFindQuery(list_bcsSendGroupDetails, "DISTINCT MID");
+				log.info("『 RichMenuExecuter execute 』: query = {}", query);
+				
+				list_Uids = query.getResultList();
+			}
+			
 			log.info("『 RichMenuExecuter execute 』: list_Uids.size() = {}", list_Uids.size());
 			log.info("『 RichMenuExecuter execute 』: list_Uids = {}", list_Uids);
 			
@@ -108,12 +129,13 @@ public class RichMenuExecuter {
 				if (!isUpdateSuccess) {
 					continue;
 				}
-				
+
 				// 計算更新成功數量
-				Count_Success++;
+				Count_Success += chopped.get(i).size();
 			}
 
 			log.info("『 RichMenuExecuter execute 』: 圖文選單更新完畢!");
+			log.info("『 RichMenuExecuter execute 』: 篩選用戶類型 : {}", groupType);
 			log.info("『 RichMenuExecuter execute 』: 預期更新用戶數 : {}", list_Uids.size());
 			log.info("『 RichMenuExecuter execute 』: 成功更新用戶數 : {}", Count_Success);
 			
