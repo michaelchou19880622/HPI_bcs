@@ -2,7 +2,7 @@
 
 <configuration scan="true">
 	<property name="APP" value="bcs" />
-	<property name="LOG_HOME" value="/bcs/log/HpiRichMenu" />
+	<property name="LOG_HOME" value="/bcs/log/richart/richmenu" />
 	<property name="CHARSET" value="UTF-8" />
 	<property name="PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} %X{ServiceId} [%L] - %msg%n" />
 	<!-- 控制台輸出 -->
