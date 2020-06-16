@@ -25,6 +25,7 @@
 			<artifactId>bcs_core</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		
 		<!-- 引入 SpringBoot Core -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -213,6 +214,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+			        <includeSystemScope>true</includeSystemScope>
+				</configuration>
 			</plugin>
 		</plugins>
 		<resources>
