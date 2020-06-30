@@ -15,20 +15,17 @@
     </appender>
     <!-- 按照每天生成日誌文件 -->
     <appender name="ROLLINGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--日誌文件輸出的文件名-->
-            <FileNamePattern>${LOG_HOME}/${APP}/${APP}-%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${LOG_HOME}/${APP}/${APP}-%d{yyyy-MM-dd}-%i.log</FileNamePattern>
             <!--日誌文件保留天數-->
             <MaxHistory>14</MaxHistory>
+            <maxFileSize>10MB</maxFileSize>    
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${PATTERN}</pattern>
             <charset>${CHARSET}</charset>
         </encoder>
-        <!--日誌文件最大的大小-->
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>10MB</MaxFileSize>
-        </triggeringPolicy>
     </appender>
 
 	<root level="INFO">
