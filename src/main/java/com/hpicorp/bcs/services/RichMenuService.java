@@ -66,6 +66,7 @@ import com.hpicorp.core.repository.BcsSystemConfigRepository;
 import com.hpicorp.core.repository.RichMenuRepository;
 import com.hpicorp.core.repository.SystemConfigRepository;
 
+import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -726,10 +727,34 @@ public class RichMenuService {
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Content-Type", contentType);
 			con.setRequestProperty("Authorization", BEARER + this.getLineTokenFromBcsSystemConfig());
+
+			log.info("『 Request Properties 』");
+			for (Map.Entry<String, List<String>> entries : con.getRequestProperties().entrySet()) {
+				String values = "";
+				
+				for (String value : entries.getValue()) {
+					values += value + ", ";
+				}
+				
+				log.info(">> " + entries.getKey() + " : " + values);
+			}
+			
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.getOutputStream().write(imageByte);
 			log.info("『 Richmenu 』Upload Image response code => {}, message => {}", con.getResponseCode(), con.getResponseMessage());
+		
+			log.info("『 Response Headers 』");
+			for (Map.Entry<String, List<String>> entries : con.getHeaderFields().entrySet()) {
+				String values = "";
+				
+				for (String value : entries.getValue()) {
+					values += value + ", ";
+				}
+				
+				log.info(">> " + entries.getKey() + " : " + values);
+			}
+			
 		} catch (IOException e) {
 			log.info("『 post 』: IOException = {}", e);
 			throw new AppException("上傳圖片失敗");
